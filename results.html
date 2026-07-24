@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Diagnostic Results — Outperform Institute</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- jsPDF for PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{--ink:#0e0e0e;--ink-mid:#3a3a3a;--ink-soft:#888;--ink-faint:#c8c8c0;--surface:#f7f6f2;--white:#ffffff;--green:#1d9e75;--green-light:#e1f5ee;--green-dark:#0f6e56;--amber:#d4860e;--red:#c0392b;--border:#e2e1db;--radius:10px;--radius-lg:16px}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:16px}
+  body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;line-height:1.6}
+
+  .site-header{background:var(--ink);padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .logo-ring{width:32px;height:32px;border:2.5px solid var(--green);border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center}
+  .logo-ring::after{content:'';width:3px;height:12px;background:var(--green);border-radius:2px;position:absolute;bottom:3px}
+  .logo-text{font-size:13px;font-weight:500;color:#fff}
+  .logo-text span{color:var(--green)}
+
+  .results-wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem 4rem}
+
+  /* VIDEO */
+  .results-video-section{margin-bottom:1.5rem;text-align:center}
+  .video-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:0.4rem}
+  .video-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;color:var(--ink);margin-bottom:1rem}
+  .video-container{border-radius:var(--radius-lg);overflow:hidden;background:var(--ink);box-shadow:0 8px 32px rgba(0,0,0,0.12)}
+
+  /* SCORE HERO */
+  .results-hero{background:var(--ink);color:#fff;border-radius:var(--radius-lg);padding:2.5rem;margin-bottom:1.5rem;text-align:center}
+  .results-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:1rem}
+  .overall-score-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:400;color:var(--green);line-height:1;margin-bottom:4px}
+  .overall-score-band{font-size:16px;color:rgba(255,255,255,0.7);margin-bottom:6px}
+  .overall-score-sub{font-size:13px;color:rgba(255,255,255,0.4)}
+
+  /* PILLAR GRID */
+  .pillar-scores-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1.5rem}
+  .pscore-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center}
+  .pscore-name{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
+  .pscore-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:400;margin-bottom:4px}
+  .pscore-bar{height:3px;border-radius:2px;background:var(--border);margin-top:6px;overflow:hidden}
+  .pscore-bar-fill{height:100%;border-radius:2px}
+
+  /* NARRATIVE */
+  .narrative-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;margin-bottom:1.5rem}
+  .narrative-box h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;margin-bottom:1rem}
+  .narrative-content{font-size:14px;line-height:1.8;color:var(--ink-mid)}
+  .narrative-content p{margin-bottom:1rem}
+  .narrative-content p:last-child{margin-bottom:0}
+
+  /* PILLAR NARRATIVE ITEMS */
+  .pillar-narrative-item{border-left:3px solid var(--border);padding-left:1rem;margin-bottom:1.25rem}
+  .pillar-narrative-item.strong{border-color:var(--green)}
+  .pillar-narrative-item.weak{border-color:var(--red)}
+  .pillar-narrative-item.mid{border-color:var(--amber)}
+  .pni-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .pni-name{font-size:13px;font-weight:500;color:var(--ink)}
+  .pni-score{font-family:'DM Mono',monospace;font-size:12px}
+  .pni-text{font-size:13px;color:var(--ink-soft);line-height:1.6}
+
+  /* PDF + CTA */
+  .action-row{display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+  .btn-download{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border:none;padding:12px 24px;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;text-decoration:none}
+  .btn-download:hover{background:var(--ink-mid)}
+  .btn-download svg{width:18px;height:18px;flex-shrink:0}
+  .pdf-status{font-size:12px;color:var(--ink-soft);font-family:'DM Mono',monospace;align-self:center}
+
+  /* CTA BOX */
+  .cta-box{background:var(--green-light);border:1px solid rgba(29,158,117,0.3);border-radius:var(--radius-lg);padding:2rem;margin-bottom:2rem}
+  .cta-box h3{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:var(--green-dark);margin-bottom:0.5rem}
+  .cta-box p{font-size:13px;color:var(--green-dark);max-width:560px;line-height:1.7;opacity:0.85;margin-bottom:1.25rem}
+
+  /* EMAIL NOTICE */
+  .email-notice{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--ink-soft)}
+  .email-notice svg{flex-shrink:0;color:var(--green)}
+
+  @media(max-width:600px){.pillar-scores-grid{grid-template-columns:repeat(3,1fr)}.action-row{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="index.html">
+    <div class="logo-ring"></div>
+    <span class="logo-text">Outperform<span>Institute</span></span>
+  </a>
+</header>
+
+<div class="results-wrap">
+
+  <!-- RESULTS VIDEO -->
+  <div class="results-video-section">
+    <div class="video-eyebrow">A message from Brian Taylor</div>
+    <div class="video-title">What your results mean — and what to do next</div>
+    <div class="video-container">
+      <video src="results-video-compressed.mp4" playsinline controls style="width:100%;border-radius:var(--radius-lg);display:block;"></video>
+    </div>
+  </div>
+
+  <!-- SCORE HERO -->
+  <div class="results-hero">
+    <div class="results-eyebrow">Your Blueprint Score</div>
+    <div class="overall-score-num" id="r-overall">—</div>
+    <div class="overall-score-band" id="r-band">—</div>
+    <div class="overall-score-sub" id="r-sub">Outperform Institute Five Pillars Assessment</div>
+  </div>
+
+  <!-- PILLAR GRID -->
+  <div class="pillar-scores-grid" id="r-pillar-grid"></div>
+
+  <!-- EMAIL NOTICE -->
+  <div class="email-notice">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+    <span id="email-notice-text">Your full report has been emailed to you.</span>
+  </div>
+
+  <!-- DOWNLOAD -->
+  <div class="action-row">
+    <button class="btn-download" onclick="downloadPDF()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Report (PDF)
+    </button>
+    <span class="pdf-status" id="pdf-status"></span>
+  </div>
+
+  <!-- NARRATIVE -->
+  <div class="narrative-box">
+    <h2>What your score means</h2>
+    <div id="narrative-output" class="narrative-content"></div>
+  </div>
+
+  <!-- PILLAR BREAKDOWN -->
+  <div class="narrative-box">
+    <h2>Pillar-by-pillar breakdown</h2>
+    <div id="pillar-narratives-output"></div>
+  </div>
+
+  <!-- CTA + CALENDLY -->
+  <div class="cta-box">
+    <h3>Let's walk through your results together.</h3>
+    <p id="cta-narrative"></p>
+    <div class="calendly-inline-widget" data-url="https://calendly.com/brian-taylor-outperforminstitute/30-minute-meeting?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=1d9e75" style="min-width:280px;height:660px;margin-top:1rem;border-radius:10px;overflow:hidden;"></div>
+    <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+  </div>
+
+</div>
+
+<script>
+const PILLARS = [
+  { id:'define',   name:'Define',    subtitle:'Designed to Win',           weight:0.20 },
+  { id:'shape',    name:'Shape',     subtitle:'Built to Execute',           weight:0.20 },
+  { id:'enlighten',name:'Enlighten', subtitle:'See Clearly, Act Decisively',weight:0.20 },
+  { id:'excite',   name:'Excite',    subtitle:'Motivate Sustained Performance',weight:0.15 },
+  { id:'control',  name:'Control',   subtitle:'Govern for Predictability',  weight:0.25 },
+];
+
+function getColor(s){ return s>=7.5?'#1d9e75':s>=6?'#d4860e':s>=4?'#c0392b':'#991b1b'; }
+function getBand(s){
+  if(s>=9)   return 'Best-in-class — scalable and disciplined';
+  if(s>=7.5) return 'Strong capability — some optimization opportunities';
+  if(s>=6)   return 'Functional but inconsistent — likely constraining growth';
+  if(s>=4)   return 'Material weakness — improvement should be prioritized';
+  return 'Dysfunctional or absent — immediate intervention required';
+}
+
+function getPillarNarrative(pi, score) {
+  const n = [
+    ['Your market definition is not driving sales execution. Reps are choosing their own targets, territories are unbalanced, and the ICP is aspirational at best. Every structural weakness downstream starts here.','You have the building blocks of a defined go-to-market, but gaps in territory design or capacity planning are limiting coverage efficiency.','Define is functional but inconsistent. ICP is understood but not always applied. Territory design exists but hasn\'t been pressure-tested against current market data.','Strong foundation. ICP clarity and territory design are mostly working. Some optimization in whitespace coverage or capacity modeling will unlock more.','Excellent market definition. ICP is explicit, territories are balanced by opportunity, and sales design directly reflects strategic priorities.'],
+    ['Your management system is essentially absent. Coaching happens by accident, and manager quality is the primary determinant of rep success. This cannot scale.','Execution depends on which manager a rep lands under. The system isn\'t driving outcomes — individuals are.','Shape is developing. Coaching and onboarding are improving but still inconsistent across managers. A common operating framework would compress the performance gap.','Strong Shape fundamentals. Most managers coach consistently and onboarding produces solid ramp outcomes.','Excellent management system. Coaching is structured, documented, and consistent. Leaders operate from a common framework.'],
+    ['Leadership is flying blind. CRM data isn\'t trustworthy, pipeline stages are subjective, and the forecast is a negotiation. You cannot fix what you cannot see.','Significant visibility gaps. Forecast accuracy is low enough to make planning unreliable.','Enlighten is functional but inconsistent. Core visibility exists but gaps in CRM data quality or forecast discipline create noise at critical moments.','Good visibility infrastructure. KPIs, pipeline stages, and forecasting are mostly working.','Excellent data discipline. You have the visibility to diagnose problems in real time and forecast with confidence.'],
+    ['Your motivational environment is not built to retain or develop talent. Top performers are likely looking around.','Excite has real gaps. The comp plan creates friction, career paths are unclear, or the performance culture tolerates underperformance.','Excite is in the middle — some dimensions work, others don\'t. Inconsistency is leaving discretionary effort on the table.','Strong motivational environment. Comp is clear, goals have line of sight, and the performance culture is healthy.','Excellent. Your team understands how they get paid, where they\'re going, and that high standards are applied fairly.'],
+    ['Your system has no governance. Process exists but isn\'t enforced. Forecast is a guess. Outcomes are entirely personality-dependent. This is the most urgent repair.','Control is the primary constraint on predictability. Process and forecast governance are inconsistent. Leadership gets surprised at quarter-end.','Control is developing. Process and stage criteria exist and are applied in most contexts, but enforcement gaps create noise.','Strong governance fundamentals. Process is mostly enforced, pipeline reviews are mostly diagnostic, and forecast governance is working.','Excellent execution governance. Process is enforced. Pipeline reviews surface real risk. Forecast governance produces dependable numbers.'],
+  ];
+  const idx = score>=9?4:score>=7.5?3:score>=6?2:score>=4?1:0;
+  return n[pi][idx];
+}
+
+function renderScoreNarrative(overall, pillarScores) {
+  const weakest = pillarScores.reduce((m,s,i,a) => s<a[m]?i:m, 0);
+  const weakestName = PILLARS[weakest].name;
+  const weakestScore = pillarScores[weakest].toFixed(1);
+  let narrative='', ctaText='';
+  if(overall>=8){
+    narrative=`Your overall score of ${overall.toFixed(1)} puts you in the top tier of sales organizations. Your systems, governance, and management infrastructure are largely in place. Your weakest pillar is ${weakestName} at ${weakestScore} — that's where the next level of performance lives. Organizations at this level are focused on optimization and scale, not structural repair.`;
+    ctaText=`Even high-scoring organizations have blind spots. Use the calendar below to connect with Brian Taylor at Outperform Institute for a no-obligation review of your results — we'll identify the specific optimizations that move the needle at your stage.`;
+  } else if(overall>=6){
+    narrative=`Your overall score of ${overall.toFixed(1)} reflects a sales organization that works — but inconsistently. Performance depends too heavily on which manager a rep lands under, which quarter it is, or which deals happen to close. Your weakest pillar is ${weakestName} at ${weakestScore}, and that's where the most structural stress is concentrated. Organizations in this range are typically one or two systemic fixes away from a materially more predictable revenue engine. The problem isn't effort — it's architecture.`;
+    ctaText=`A score below 8.0 means structural gaps are constraining your growth. Outperform Institute specializes in diagnosing exactly these patterns and building the systems to close them. Use the calendar below for a no-obligation 30-minute call with Brian Taylor to walk through your results.`;
+  } else if(overall>=4){
+    narrative=`Your overall score of ${overall.toFixed(1)} indicates material structural weakness across the revenue organization. Your ${weakestName} pillar scored ${weakestScore} — that's the most urgent pressure point. At this level, revenue growth is largely personality-dependent. A few strong performers carry the number while the underlying system creates drag, forecast noise, and performance variability that compounds over time. The good news: organizations at this stage see the fastest improvement from intentional structural investment because the leverage is high.`;
+    ctaText=`Your score indicates structural gaps actively constraining revenue growth. Outperform Institute exists to help organizations in exactly this position build the systems that make performance predictable. Use the calendar below for a no-obligation 30-minute call with Brian Taylor — we'll walk through your results and show you what a structured improvement plan looks like.`;
+  } else {
+    narrative=`Your overall score of ${overall.toFixed(1)} signals that the current sales architecture needs significant attention across multiple pillars. Your ${weakestName} pillar at ${weakestScore} is the most critical gap. The organization is running on individual heroics rather than systems — which means growth is unpredictable, the forecast is unreliable, and the business is fragile to attrition of key performers. This isn't a talent problem. It's a structural one, and it's fixable.`;
+    ctaText=`Organizations at this score level need immediate structural intervention. Outperform Institute has helped companies in this position build the revenue architecture required for consistent, predictable growth. Use the calendar below for a no-obligation 30-minute call with Brian Taylor — no pitch, just a clear-eyed review of your results.`;
+  }
+  document.getElementById('narrative-output').innerHTML=`<p>${narrative}</p>`;
+  document.getElementById('cta-narrative').textContent=ctaText;
+}
+
+// ── PDF GENERATION ───────────────────────────────────────────────
+async function downloadPDF() {
+  const btn = document.querySelector('.btn-download');
+  const status = document.getElementById('pdf-status');
+  btn.style.opacity = '0.6';
+  btn.style.pointerEvents = 'none';
+  status.textContent = 'Generating PDF...';
+
+  const results = JSON.parse(sessionStorage.getItem('oi_results') || '{}');
+  const { contact, pillarScores, overall } = results;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210, H = 297;
+  const margin = 20;
+  let y = 0;
+
+  // ── COVER PAGE ──────────────────────────────────────
+  // Dark background
+  doc.setFillColor(14, 14, 14);
+  doc.rect(0, 0, W, H, 'F');
+
+  // Green accent bar
+  doc.setFillColor(29, 158, 117);
+  doc.rect(0, 0, W, 4, 'F');
+
+  // Logo text
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('OUTPERFORM', margin, 22);
+  doc.setTextColor(29, 158, 117);
+  doc.text('INSTITUTE', margin + 46, 22);
+
+  // Main title
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(28);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Sales Organization', margin, 80);
+  doc.text('Diagnostic Report', margin, 95);
+
+  // Green underline
+  doc.setFillColor(29, 158, 117);
+  doc.rect(margin, 100, 80, 1.5, 'F');
+
+  // Company name
+  doc.setTextColor(29, 158, 117);
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'normal');
+  doc.text(contact?.company || 'Your Organization', margin, 115);
+
+  // Contact details
+  doc.setTextColor(180, 180, 180);
+  doc.setFontSize(10);
+  doc.text(`${contact?.firstName || ''} ${contact?.lastName || ''} — ${contact?.title || ''}`, margin, 128);
+  doc.text(new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}), margin, 138);
+
+  // Overall score on cover
+  const scoreColor = overall >= 7.5 ? [29,158,117] : overall >= 6 ? [212,134,14] : [192,57,43];
+  doc.setFillColor(30, 30, 30);
+  doc.roundedRect(margin, 158, W - margin*2, 60, 4, 4, 'F');
+  doc.setTextColor(...scoreColor);
+  doc.setFontSize(52);
+  doc.setFont('helvetica', 'bold');
+  doc.text(overall.toFixed(1), W/2, 196, { align: 'center' });
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(180, 180, 180);
+  doc.text('OVERALL BLUEPRINT SCORE', W/2, 206, { align: 'center' });
+  doc.setFontSize(9);
+  doc.text(getBand(overall).toUpperCase(), W/2, 213, { align: 'center' });
+
+  // Footer
+  doc.setTextColor(80, 80, 80);
+  doc.setFontSize(8);
+  doc.text('outperforminstitute.online', W/2, H-15, { align:'center' });
+  doc.text('Confidential — Prepared exclusively for ' + (contact?.company || 'your organization'), W/2, H-10, { align:'center' });
+
+  // ── PAGE 2: PILLAR SCORES ──────────────────────────
+  doc.addPage();
+  doc.setFillColor(247, 246, 242);
+  doc.rect(0, 0, W, H, 'F');
+
+  // Header stripe
+  doc.setFillColor(14, 14, 14);
+  doc.rect(0, 0, W, 18, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.text('OUTPERFORM INSTITUTE', margin, 11);
+  doc.setTextColor(29, 158, 117);
+  doc.text('DIAGNOSTIC REPORT', W - margin, 11, { align: 'right' });
+
+  y = 35;
+  doc.setTextColor(14, 14, 14);
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Pillar Score Summary', margin, y);
+  y += 6;
+  doc.setFillColor(29, 158, 117);
+  doc.rect(margin, y, 40, 1, 'F');
+  y += 12;
+
+  const pillarNames = ['Define','Shape','Enlighten','Excite','Control'];
+  const pillarWeights = ['20%','20%','20%','15%','25%'];
+
+  pillarScores.forEach((score, i) => {
+    const color = score>=7.5?[29,158,117]:score>=6?[212,134,14]:[192,57,43];
+    const band = score>=7.5?'Strong':score>=6?'Functional':score>=4?'Weak':'Critical';
+
+    // Card background
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(margin, y, W - margin*2, 28, 2, 2, 'F');
+
+    // Color bar
+    doc.setFillColor(...color);
+    doc.rect(margin, y, 4, 28, 'F');
+
+    // Pillar name
+    doc.setTextColor(14, 14, 14);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text(pillarNames[i].toUpperCase(), margin + 10, y + 10);
+
+    // Weight
+    doc.setTextColor(136, 136, 136);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text(pillarWeights[i] + ' weight', margin + 10, y + 18);
+
+    // Score
+    doc.setTextColor(...color);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text(score.toFixed(1), W - margin - 35, y + 12);
+
+    // Band
+    doc.setTextColor(136, 136, 136);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text(band, W - margin - 35, y + 20);
+
+    // Progress bar background
+    const barX = margin + 55, barY = y + 14, barW = W - margin*2 - 85, barH = 3;
+    doc.setFillColor(226, 225, 219);
+    doc.rect(barX, barY, barW, barH, 'F');
+    doc.setFillColor(...color);
+    doc.rect(barX, barY, barW * (score/10), barH, 'F');
+
+    y += 34;
+  });
+
+  // ── PAGE 3: NARRATIVE ──────────────────────────────
+  doc.addPage();
+  doc.setFillColor(247, 246, 242);
+  doc.rect(0, 0, W, H, 'F');
+  doc.setFillColor(14, 14, 14);
+  doc.rect(0, 0, W, 18, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(8);
+  doc.setFont('helvetica','bold');
+  doc.text('OUTPERFORM INSTITUTE', margin, 11);
+  doc.setTextColor(29,158,117);
+  doc.text('DIAGNOSTIC REPORT', W-margin, 11, {align:'right'});
+
+  y = 35;
+  doc.setTextColor(14,14,14);
+  doc.setFontSize(20);
+  doc.setFont('helvetica','bold');
+  doc.text('What Your Score Means', margin, y);
+  y += 6;
+  doc.setFillColor(29,158,117);
+  doc.rect(margin, y, 40, 1, 'F');
+  y += 12;
+
+  const narrativeEl = document.getElementById('narrative-output');
+  const narrativeText = narrativeEl ? narrativeEl.innerText : '';
+  doc.setTextColor(58, 58, 58);
+  doc.setFontSize(10);
+  doc.setFont('helvetica','normal');
+  const narLines = doc.splitTextToSize(narrativeText, W - margin*2);
+  doc.text(narLines, margin, y);
+  y += narLines.length * 5 + 15;
+
+  doc.setTextColor(14,14,14);
+  doc.setFontSize(16);
+  doc.setFont('helvetica','bold');
+  doc.text('Pillar-by-Pillar Breakdown', margin, y);
+  y += 4;
+  doc.setFillColor(29,158,117);
+  doc.rect(margin, y, 40, 1, 'F');
+  y += 10;
+
+  PILLARS.forEach((p, i) => {
+    const score = pillarScores[i];
+    const color = score>=7.5?[29,158,117]:score>=6?[212,134,14]:[192,57,43];
+    if(y > H - 40){ doc.addPage(); doc.setFillColor(247,246,242); doc.rect(0,0,W,H,'F'); y = 25; }
+    doc.setTextColor(...color);
+    doc.setFontSize(10);
+    doc.setFont('helvetica','bold');
+    doc.text(`${p.name} — ${score.toFixed(1)}/10`, margin, y);
+    y += 5;
+    const pText = getPillarNarrative(i, score);
+    doc.setTextColor(58,58,58);
+    doc.setFontSize(9);
+    doc.setFont('helvetica','normal');
+    const pLines = doc.splitTextToSize(pText, W - margin*2);
+    doc.text(pLines, margin, y);
+    y += pLines.length * 4.5 + 10;
+  });
+
+  // ── PAGE 4: NEXT STEPS ─────────────────────────────
+  doc.addPage();
+  doc.setFillColor(14,14,14);
+  doc.rect(0, 0, W, H, 'F');
+  doc.setFillColor(29,158,117);
+  doc.rect(0, 0, W, 4, 'F');
+
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(22);
+  doc.setFont('helvetica','bold');
+  doc.text('Ready to close the gaps?', margin, 50);
+  doc.setFillColor(29,158,117);
+  doc.rect(margin, 55, 60, 1.5, 'F');
+
+  doc.setFontSize(10);
+  doc.setFont('helvetica','normal');
+  doc.setTextColor(180,180,180);
+  const ctaText = document.getElementById('cta-narrative')?.textContent || '';
+  const ctaLines = doc.splitTextToSize(ctaText, W - margin*2);
+  doc.text(ctaLines, margin, 70);
+
+  doc.setFillColor(29,158,117);
+  doc.roundedRect(margin, 120, 100, 14, 3, 3, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(11);
+  doc.setFont('helvetica','bold');
+  doc.text('Book a 30-Minute Call', margin + 50, 129, { align:'center' });
+
+  doc.setTextColor(180,180,180);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','normal');
+  doc.text('calendly.com/brian-taylor-outperforminstitute/30-minute-meeting', margin, 145);
+
+  doc.setTextColor(80,80,80);
+  doc.setFontSize(8);
+  doc.text('outperforminstitute.online', W/2, H-15, {align:'center'});
+
+  // Save
+  const filename = `Outperform-Diagnostic-${(contact?.company||'Report').replace(/[^a-z0-9]/gi,'-')}-${new Date().toISOString().slice(0,10)}.pdf`;
+  doc.save(filename);
+  btn.style.opacity = '1';
+  btn.style.pointerEvents = 'auto';
+  status.textContent = 'Report saved.';
+  setTimeout(() => status.textContent = '', 4000);
+}
+
+// ── EMAIL REPORT ─────────────────────────────────────────────────
+async function sendEmailReport(contact, pillarScores, overall) {
+  const emailBody = `
+Thank you for completing the Outperform Institute Sales Organization Diagnostic.
+
+Your Overall Blueprint Score: ${overall.toFixed(1)}/10
+${getBand(overall)}
+
+PILLAR SCORES
+Define:    ${pillarScores[0].toFixed(1)}/10
+Shape:     ${pillarScores[1].toFixed(1)}/10
+Enlighten: ${pillarScores[2].toFixed(1)}/10
+Excite:    ${pillarScores[3].toFixed(1)}/10
+Control:   ${pillarScores[4].toFixed(1)}/10
+
+Your scores reveal where your revenue system is structurally sound and where it's carrying hidden stress. The pillar breakdown in your full report shows exactly where to focus.
+
+If you haven't already, I'd like to invite you to schedule a no-obligation 30-minute call with me personally. We'll walk through your results together and talk about what a structured improvement plan looks like for your organization.
+
+Book your call here:
+https://calendly.com/brian-taylor-outperforminstitute/30-minute-meeting
+
+Brian Taylor
+Founder & CEO, Outperform Institute
+outperforminstitute.online
+  `.trim();
+
+  try {
+    await fetch('/.netlify/functions/api', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'notify',
+        data: {
+          first_name: contact.firstName,
+          last_name: contact.lastName,
+          email: contact.email,
+          company: contact.company,
+          overall_score: overall.toFixed(1),
+          score_band: getBand(overall),
+          define_score: pillarScores[0].toFixed(1),
+          shape_score: pillarScores[1].toFixed(1),
+          enlighten_score: pillarScores[2].toFixed(1),
+          excite_score: pillarScores[3].toFixed(1),
+          control_score: pillarScores[4].toFixed(1),
+          email_body: emailBody,
+          send_to_prospect: 'true',
+          prospect_email: contact.email,
+        }
+      })
+    });
+  } catch(e) {
+    console.error('Email send error:', e);
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const stored = sessionStorage.getItem('oi_results');
+  if (!stored) { window.location.href = 'index.html'; return; }
+
+  const results = JSON.parse(stored);
+  const { contact, pillarScores, overall } = results;
+
+  // Render score header
+  document.getElementById('r-overall').textContent = overall.toFixed(1);
+  document.getElementById('r-band').textContent = getBand(overall);
+  document.getElementById('r-sub').textContent =
+    `${contact.company} — ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}`;
+
+  // Email notice
+  document.getElementById('email-notice-text').textContent =
+    `Your full report has been emailed to ${contact.email}.`;
+
+  // Pillar grid
+  const grid = document.getElementById('r-pillar-grid');
+  PILLARS.forEach((p, i) => {
+    const s = pillarScores[i];
+    const color = getColor(s);
+    grid.innerHTML += `<div class="pscore-card">
+      <div class="pscore-name">${p.name}</div>
+      <div class="pscore-num" style="color:${color}">${s.toFixed(1)}</div>
+      <div style="font-size:10px;color:#888;font-family:'DM Mono',monospace">${Math.round(p.weight*100)}% wt</div>
+      <div class="pscore-bar"><div class="pscore-bar-fill" style="width:${s*10}%;background:${color}"></div></div>
+    </div>`;
+  });
+
+  // Narrative
+  renderScoreNarrative(overall, pillarScores);
+
+  // Pillar breakdown
+  const pno = document.getElementById('pillar-narratives-output');
+  PILLARS.forEach((p, i) => {
+    const s = pillarScores[i];
+    const cls = s>=7.5?'strong':s>=5?'mid':'weak';
+    const band = s>=7.5?'Strong':s>=6?'Functional':s>=4?'Weak':'Critical';
+    const color = getColor(s);
+    pno.innerHTML += `<div class="pillar-narrative-item ${cls}">
+      <div class="pni-head">
+        <div class="pni-name">${p.name} — ${p.subtitle}</div>
+        <div class="pni-score" style="color:${color}">${s.toFixed(1)} / 10 · ${band}</div>
+      </div>
+      <div class="pni-text">${getPillarNarrative(i, s)}</div>
+    </div>`;
+  });
+
+  // Send email report to prospect (async — doesn't block page)
+  sendEmailReport(contact, pillarScores, overall);
+});
+</script>
+</body>
+</html>
