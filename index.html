@@ -58,6 +58,18 @@
   input:focus,select:focus{border-color:var(--green);background:var(--white)}
   select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
 
+  /* ASSESSMENT PREVIEW */
+  .assessment-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem;margin-top:1.5rem}
+  .preview-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:0.4rem}
+  .preview-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:var(--ink);margin-bottom:0.75rem}
+  .preview-intro{font-size:13px;color:var(--ink-soft);line-height:1.7;margin-bottom:1.25rem}
+  .preview-grid{display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.25rem}
+  .preview-item{display:flex;gap:1rem;align-items:flex-start}
+  .preview-icon{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);background:var(--green-light);padding:4px 8px;border-radius:6px;flex-shrink:0;margin-top:2px}
+  .preview-name{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:2px}
+  .preview-desc{font-size:12px;color:var(--ink-soft);line-height:1.6}
+  .preview-note{font-size:12px;color:var(--ink-soft);border-top:1px solid var(--border);padding-top:1rem;font-style:italic;line-height:1.6}
+
   /* REQUIRED FIELD INDICATOR */
   .req{color:var(--green);margin-left:2px}
 
@@ -191,6 +203,50 @@
           <option>Other</option>
         </select>
       </div>
+    </div>
+
+    <div class="assessment-preview">
+      <div class="preview-eyebrow">What to expect</div>
+      <div class="preview-title">What the assessment covers</div>
+      <p class="preview-intro">The survey includes 25 questions across five structural areas of your sales organization. Your responses will help assess the current state of your revenue system and identify key themes and priorities that will serve as the foundation for a more focused and productive discussion.</p>
+      <div class="preview-grid">
+        <div class="preview-item">
+          <div class="preview-icon">01</div>
+          <div class="preview-content">
+            <div class="preview-name">Go-to-Market Strategy</div>
+            <div class="preview-desc">How clearly your organization defines its target market, ideal customer profile, territory design, and growth strategy alignment.</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <div class="preview-icon">02</div>
+          <div class="preview-content">
+            <div class="preview-name">Management and Coaching</div>
+            <div class="preview-desc">The quality and consistency of your frontline management, coaching infrastructure, onboarding effectiveness, and leadership alignment.</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <div class="preview-icon">03</div>
+          <div class="preview-content">
+            <div class="preview-name">Revenue Visibility</div>
+            <div class="preview-desc">How clearly your leadership team can see pipeline quality, forecast accuracy, CRM data integrity, and real-time performance indicators.</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <div class="preview-icon">04</div>
+          <div class="preview-content">
+            <div class="preview-name">Talent Motivation</div>
+            <div class="preview-desc">Whether your compensation design, goal clarity, career architecture, and performance culture drive sustained discretionary effort.</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <div class="preview-icon">05</div>
+          <div class="preview-content">
+            <div class="preview-name">Operational Controls and Governance</div>
+            <div class="preview-desc">The rigor of your sales process enforcement, pipeline review discipline, forecast governance, and performance management cadence.</div>
+          </div>
+        </div>
+      </div>
+      <div class="preview-note">Score what actually happens in your organization day to day — not what's written in a playbook. The more honest your answers, the more valuable your results.</div>
     </div>
 
     <div class="cta-wrap">
