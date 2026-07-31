@@ -81,6 +81,17 @@
 
   @media(max-width:600px){.pillar-scores-grid{grid-template-columns:repeat(3,1fr)}.action-row{flex-direction:column}}
 </style>
+<!-- Google Analytics 4 — Outperform Institute -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NTTG74NJHE"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+  gtag("config", "G-NTTG74NJHE", {"send_page_view": true});
+  function trackEvent(name, params) {
+    if(typeof gtag !== "undefined") gtag("event", name, params || {});
+  }
+</script>
 </head>
 <body>
 
@@ -244,6 +255,7 @@ function renderScoreNarrative(overall, pillarScores) {
 
 // ── PDF GENERATION ───────────────────────────────────────────────
 async function downloadPDF() {
+  trackEvent('pdf_download', { page: 'results' });
   const btn = document.querySelector('.btn-download');
   const status = document.getElementById('pdf-status');
   btn.style.opacity = '0.6';
@@ -509,6 +521,39 @@ document.addEventListener('DOMContentLoaded', () => {
   const results = JSON.parse(stored);
   const { contact, pillarScores, overall } = results;
 
+  // Track results page view
+  trackEvent('results_view', {
+    overall_score: overall.toFixed(1),
+    score_band: getBand(overall),
+    company: contact.company,
+  });
+
+  // Track Calendly widget becoming visible
+  const calendlyObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        trackEvent('calendly_view', { page: 'results' });
+        calendlyObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.5 });
+  const calendlyEl = document.querySelector('.calendly-inline-widget');
+  if (calendlyEl) calendlyObserver.observe(calendlyEl);
+
+  // Track results video play
+  const resultsVideo = document.querySelector('iframe[src*="youtube"]');
+  if (resultsVideo) {
+    const videoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          trackEvent('results_video_view', { page: 'results' });
+          videoObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    videoObserver.observe(resultsVideo);
+  }
+
   // Render score header
   document.getElementById('r-overall').textContent = overall.toFixed(1);
   document.getElementById('r-band').textContent = getBand(overall);
@@ -556,5 +601,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
-
