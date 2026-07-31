@@ -97,6 +97,17 @@
     .hero{padding:2.5rem 1.25rem 2rem}
   }
 </style>
+<!-- Google Analytics 4 — Outperform Institute -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NTTG74NJHE"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+  gtag("config", "G-NTTG74NJHE", {"send_page_view": true});
+  function trackEvent(name, params) {
+    if(typeof gtag !== "undefined") gtag("event", name, params || {});
+  }
+</script>
 </head>
 <body>
 
@@ -291,12 +302,42 @@ function unmuteVideo() {
 document.addEventListener('DOMContentLoaded', () => {
   const video = document.getElementById('explainer-video');
   if (video) {
+    // Track video play
+    let videoTracked = false;
+    video.addEventListener('play', () => {
+      if (!videoTracked) {
+        trackEvent('video_play', { video_title: 'Explainer Video', page: 'landing' });
+        videoTracked = true;
+      }
+    });
+    // Track video completion (75%+)
+    video.addEventListener('timeupdate', () => {
+      if (!video._completionTracked && video.duration && (video.currentTime / video.duration) >= 0.75) {
+        trackEvent('video_progress', { video_title: 'Explainer Video', progress: '75%' });
+        video._completionTracked = true;
+      }
+    });
     video.addEventListener('volumechange', () => {
       const btn = document.getElementById('unmute-btn');
       if (!video.muted) btn.classList.add('hidden');
     });
     video.play().catch(() => {});
   }
+
+  // Track form field focus (form start)
+  const formFields = ['fname','lname','email','phone','title','company'];
+  let formStartTracked = false;
+  formFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('focus', () => {
+        if (!formStartTracked) {
+          trackEvent('form_start', { form_name: 'Contact Form' });
+          formStartTracked = true;
+        }
+      });
+    }
+  });
 });
 
 function validateForm() {
@@ -339,6 +380,8 @@ function startAssessment() {
     arr:       document.getElementById('arr').value,
     industry:  document.getElementById('industry').value,
   };
+  trackEvent('form_submit', { form_name: 'Contact Form', company: contact.company });
+  trackEvent('assessment_start', { company: contact.company });
   sessionStorage.setItem('oi_contact', JSON.stringify(contact));
   window.location.href = 'assessment.html';
 }
