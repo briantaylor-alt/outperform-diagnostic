@@ -85,6 +85,17 @@
 
   @media(max-width:600px){.pillar-card-header{flex-direction:column}.rub-label{display:none}.pillar-tabs{gap:2px}}
 </style>
+<!-- Google Analytics 4 — Outperform Institute -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NTTG74NJHE"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+  gtag("config", "G-NTTG74NJHE", {"send_page_view": true});
+  function trackEvent(name, params) {
+    if(typeof gtag !== "undefined") gtag("event", name, params || {});
+  }
+</script>
 </head>
 <body>
 
@@ -294,6 +305,14 @@ function selectScore(key, val, pillarId) {
 }
 
 function showPanel(idx) {
+  // Track pillar completion when moving forward
+  if (idx > currentPanel) {
+    const completedPillar = PILLARS[currentPanel];
+    const allAnswered = completedPillar.questions.every(q => scores[`${completedPillar.id}_${q.id}`] !== undefined);
+    if (allAnswered) {
+      trackEvent('pillar_complete', { pillar_name: completedPillar.name, pillar_index: currentPanel + 1 });
+    }
+  }
   document.querySelectorAll('.pillar-panel').forEach((p,i) => p.classList.toggle('active', i===idx));
   document.querySelectorAll('.ptab').forEach((t,i) => t.classList.toggle('active', i===idx));
   currentPanel = idx;
@@ -421,6 +440,13 @@ async function submitAssessment() {
       })
     })
   ]);
+
+  // Track assessment completion
+  trackEvent('assessment_complete', {
+    overall_score: overall.toFixed(1),
+    score_band: getBand(overall),
+    company: contact.company,
+  });
 
   // Go to results
   window.location.href = 'results.html';
