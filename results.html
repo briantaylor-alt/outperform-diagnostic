@@ -23,6 +23,13 @@
 
   .results-wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem 4rem}
 
+  /* FADE-UP ANIMATIONS */
+  .fade-up{opacity:0;transform:translateY(28px);transition:opacity 0.55s cubic-bezier(0.22,1,0.36,1),transform 0.55s cubic-bezier(0.22,1,0.36,1)}
+  .fade-up.visible{opacity:1;transform:translateY(0)}
+  .fade-up-delay-1{transition-delay:0.12s}
+  .fade-up-delay-2{transition-delay:0.24s}
+  .fade-up-delay-3{transition-delay:0.36s}
+
   /* VIDEO */
   .results-video-section{margin-bottom:1.5rem;text-align:center}
   .video-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:0.4rem}
@@ -92,6 +99,8 @@
     if(typeof gtag !== "undefined") gtag("event", name, params || {});
   }
 </script>
+<!-- GHL External Tracking — page views only -->
+<script src="https://api.revenuelab360.com/js/external-tracking.js" data-tracking-id="tk_92d57f1396f44634b856b21f3d1f67d2" data-debug="true"></script>
 </head>
 <body>
 
@@ -105,7 +114,7 @@
 <div class="results-wrap">
 
   <!-- RESULTS VIDEO -->
-  <div class="results-video-section">
+  <div class="results-video-section fade-up">
     <div class="video-eyebrow">A message from Brian Taylor</div>
     <div class="video-title">What your results mean — and what to do next</div>
     <div class="video-container">
@@ -114,7 +123,7 @@
   </div>
 
   <!-- SCORE HERO -->
-  <div class="results-hero">
+  <div class="results-hero fade-up fade-up-delay-1">
     <div class="results-eyebrow">Your Blueprint Score</div>
     <div class="overall-score-num" id="r-overall">—</div>
     <div class="overall-score-band" id="r-band">—</div>
@@ -125,13 +134,13 @@
   <div class="pillar-scores-grid" id="r-pillar-grid"></div>
 
   <!-- EMAIL NOTICE -->
-  <div class="email-notice">
+  <div class="email-notice fade-up fade-up-delay-2">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
     <span id="email-notice-text">Your full report has been emailed to you.</span>
   </div>
 
   <!-- DOWNLOAD -->
-  <div class="action-row">
+  <div class="action-row fade-up fade-up-delay-3">
     <button class="btn-download" onclick="downloadPDF()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download Report (PDF)
@@ -504,18 +513,52 @@ async function downloadPDF() {
   doc.setFontSize(8);
   doc.text('outperforminstitute.online', W/2, H-15, {align:'center'});
 
-  // Save
+  // Save locally
   const filename = `Outperform-Diagnostic-${(contact?.company||'Report').replace(/[^a-z0-9]/gi,'-')}-${new Date().toISOString().slice(0,10)}.pdf`;
   doc.save(filename);
   btn.style.opacity = '1';
   btn.style.pointerEvents = 'auto';
   status.textContent = 'Report saved.';
   setTimeout(() => status.textContent = '', 4000);
+
+  // Upload PDF to GHL contact record (async — non-blocking)
+  try {
+    const pdfBase64 = doc.output('datauristring').split(',')[1];
+    fetch('/.netlify/functions/api', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'ghl_upload_pdf',
+        email: contact?.email,
+        pdfBase64,
+        fileName: filename,
+      }),
+    }).then(r => r.json()).then(d => {
+      if (d.success) console.log('[GHL] PDF uploaded to contact:', d.fileId);
+      else console.warn('[GHL] PDF upload skipped:', d.reason || d.error);
+    }).catch(e => console.warn('[GHL] PDF upload error:', e.message));
+  } catch(e) {
+    console.warn('[GHL] PDF generation error:', e.message);
+  }
+}
+
+// ── FADE-UP OBSERVER ─────────────────────────────────────────────
+function initFadeUp() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 }
 
 // ── INIT ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  const stored = sessionStorage.getItem('oi_results');
+  setTimeout(initFadeUp, 80);
+  const stored = sessionStorage.getItem('oi_results') || localStorage.getItem('oi_results');
   if (!stored) { window.location.href = 'index.html'; return; }
 
   const results = JSON.parse(stored);
