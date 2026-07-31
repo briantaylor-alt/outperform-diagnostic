@@ -58,6 +58,15 @@
   input:focus,select:focus{border-color:var(--green);background:var(--white)}
   select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
 
+  /* FADE-UP ANIMATIONS */
+  .fade-up{opacity:0;transform:translateY(28px);transition:opacity 0.55s cubic-bezier(0.22,1,0.36,1),transform 0.55s cubic-bezier(0.22,1,0.36,1)}
+  .fade-up.visible{opacity:1;transform:translateY(0)}
+  .fade-up-delay-1{transition-delay:0.1s}
+  .fade-up-delay-2{transition-delay:0.2s}
+  .fade-up-delay-3{transition-delay:0.3s}
+  .fade-up-delay-4{transition-delay:0.4s}
+  .fade-up-delay-5{transition-delay:0.5s}
+
   /* ASSESSMENT PREVIEW */
   .assessment-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem;margin-top:1.5rem}
   .preview-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:0.4rem}
@@ -108,6 +117,8 @@
     if(typeof gtag !== "undefined") gtag("event", name, params || {});
   }
 </script>
+<!-- GHL External Tracking — page views only, isolated from webhook handlers -->
+<script src="https://api.revenuelab360.com/js/external-tracking.js" data-tracking-id="tk_92d57f1396f44634b856b21f3d1f67d2" data-debug="true"></script>
 </head>
 <body>
 
@@ -132,7 +143,7 @@
 <div class="form-wrap">
 
   <!-- EXPLAINER VIDEO -->
-  <div class="video-section">
+  <div class="video-section fade-up">
     <div class="video-eyebrow">Watch Before You Begin</div>
     <div class="video-title">Why this diagnostic is different</div>
     <div class="video-sub">Two minutes. Understand what the Five Pillars reveal — and why honest answers matter more than aspirational ones.</div>
@@ -143,7 +154,7 @@
   </div>
 
   <!-- CONTACT FORM -->
-  <div class="contact-section">
+  <div class="contact-section fade-up fade-up-delay-1">
     <div class="section-eyebrow">Before you begin</div>
     <div class="section-title">Tell us about your organization</div>
     <div class="section-sub">Your results will be personalized to your company. We'll also email you a copy of your report when you're done.</div>
@@ -291,84 +302,133 @@
 </div>
 
 <script>
+// ── GHL WEBHOOK — fires through Netlify function to avoid CORS ──
+async function fireGHLWebhook(payload) {
+  try {
+    await fetch('/.netlify/functions/api', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'ghl_webhook', payload }),
+    });
+  } catch(e) {
+    console.warn('[GHL Webhook] Error:', e.message);
+  }
+}
+
 function unmuteVideo() {
   const video = document.getElementById('explainer-video');
   const btn = document.getElementById('unmute-btn');
   video.muted = !video.muted;
   btn.classList.toggle('hidden', !video.muted);
-  if (!video.muted) btn.textContent = '🔇 Tap to unmute';
+  if (!video.muted) btn.textContent = '\U0001F507 Tap to unmute';
+}
+
+// ── FADE-UP OBSERVER ─────────────────────────────────────────────
+function initFadeUp() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+}
+
+// ── LOCALSTORAGE FORM PERSISTENCE ───────────────────────────────
+function restoreFormFromStorage() {
+  const saved = localStorage.getItem('oi_contact_draft');
+  if (!saved) return;
+  try {
+    const d = JSON.parse(saved);
+    const map = { fname:d.firstName, lname:d.lastName, email:d.email,
+      phone:d.phone, title:d.title, company:d.company,
+      teamsize:d.teamSize, arr:d.arr, industry:d.industry };
+    Object.entries(map).forEach(([id,val]) => {
+      const el = document.getElementById(id);
+      if (el && val) el.value = val;
+    });
+  } catch(e) {}
+}
+
+function saveFormDraft() {
+  const draft = {
+    firstName: document.getElementById('fname')?.value||'',
+    lastName:  document.getElementById('lname')?.value||'',
+    email:     document.getElementById('email')?.value||'',
+    phone:     document.getElementById('phone')?.value||'',
+    title:     document.getElementById('title')?.value||'',
+    company:   document.getElementById('company')?.value||'',
+    teamSize:  document.getElementById('teamsize')?.value||'',
+    arr:       document.getElementById('arr')?.value||'',
+    industry:  document.getElementById('industry')?.value||'',
+  };
+  localStorage.setItem('oi_contact_draft', JSON.stringify(draft));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  restoreFormFromStorage();
+  ['fname','lname','email','phone','title','company','teamsize','arr','industry'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.addEventListener('input', saveFormDraft); el.addEventListener('change', saveFormDraft); }
+  });
+  setTimeout(initFadeUp, 80);
+
   const video = document.getElementById('explainer-video');
   if (video) {
-    // Track video play
     let videoTracked = false;
     video.addEventListener('play', () => {
-      if (!videoTracked) {
-        trackEvent('video_play', { video_title: 'Explainer Video', page: 'landing' });
-        videoTracked = true;
-      }
+      if (!videoTracked) { trackEvent('video_play',{video_title:'Explainer Video',page:'landing'}); videoTracked=true; }
     });
-    // Track video completion (75%+)
     video.addEventListener('timeupdate', () => {
-      if (!video._completionTracked && video.duration && (video.currentTime / video.duration) >= 0.75) {
-        trackEvent('video_progress', { video_title: 'Explainer Video', progress: '75%' });
-        video._completionTracked = true;
+      if (!video._ct && video.duration && (video.currentTime/video.duration)>=0.75) {
+        trackEvent('video_progress',{video_title:'Explainer Video',progress:'75%'}); video._ct=true;
       }
     });
     video.addEventListener('volumechange', () => {
       const btn = document.getElementById('unmute-btn');
       if (!video.muted) btn.classList.add('hidden');
     });
-    video.play().catch(() => {});
+    video.play().catch(()=>{});
   }
 
-  // Track form field focus (form start)
-  const formFields = ['fname','lname','email','phone','title','company'];
   let formStartTracked = false;
-  formFields.forEach(id => {
+  ['fname','lname','email','phone','title','company'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('focus', () => {
-        if (!formStartTracked) {
-          trackEvent('form_start', { form_name: 'Contact Form' });
-          formStartTracked = true;
-        }
-      });
-    }
+    if (el) el.addEventListener('focus', () => {
+      if (!formStartTracked) { trackEvent('form_start',{form_name:'Contact Form'}); formStartTracked=true; }
+    });
   });
 });
 
 function validateForm() {
   let valid = true;
   const required = [
-    { id: 'fname',   errId: 'err-fname',   type: 'text' },
-    { id: 'lname',   errId: 'err-lname',   type: 'text' },
-    { id: 'email',   errId: 'err-email',   type: 'email' },
-    { id: 'phone',   errId: 'err-phone',   type: 'text' },
-    { id: 'title',   errId: 'err-title',   type: 'text' },
-    { id: 'company', errId: 'err-company', type: 'text' },
+    {id:'fname',errId:'err-fname',type:'text'},
+    {id:'lname',errId:'err-lname',type:'text'},
+    {id:'email',errId:'err-email',type:'email'},
+    {id:'phone',errId:'err-phone',type:'text'},
+    {id:'title',errId:'err-title',type:'text'},
+    {id:'company',errId:'err-company',type:'text'},
   ];
-  required.forEach(({ id, errId, type }) => {
+  required.forEach(({id,errId,type}) => {
     const el = document.getElementById(id);
     const err = document.getElementById(errId);
-    let bad = false;
-    if (!el.value.trim()) { bad = true; }
-    if (type === 'email' && el.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value)) { bad = true; }
-    el.classList.toggle('error', bad);
-    err.classList.toggle('visible', bad);
-    if (bad) valid = false;
+    let bad = !el.value.trim();
+    if (type==='email' && el.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value)) bad=true;
+    el.classList.toggle('error',bad);
+    err.classList.toggle('visible',bad);
+    if (bad) valid=false;
   });
   return valid;
 }
 
-function startAssessment() {
+async function startAssessment() {
   if (!validateForm()) {
-    document.querySelector('.error').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.querySelector('.error').scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
-  // Store contact data in sessionStorage for the assessment page
   const contact = {
     firstName: document.getElementById('fname').value.trim(),
     lastName:  document.getElementById('lname').value.trim(),
@@ -380,11 +440,29 @@ function startAssessment() {
     arr:       document.getElementById('arr').value,
     industry:  document.getElementById('industry').value,
   };
-  trackEvent('form_submit', { form_name: 'Contact Form', company: contact.company });
-  trackEvent('assessment_start', { company: contact.company });
+
+  // Persist to both storages
+  localStorage.setItem('oi_contact', JSON.stringify(contact));
+  localStorage.setItem('oi_contact_draft', JSON.stringify(contact));
   sessionStorage.setItem('oi_contact', JSON.stringify(contact));
+
+  trackEvent('form_submit',{form_name:'Contact Form',company:contact.company});
+  trackEvent('assessment_start',{company:contact.company});
+
+  // GHL WEBHOOK ACTION A — capture contact immediately (fire-and-forget)
+  fireGHLWebhook({
+    'First Name': contact.firstName,
+    'Last Name':  contact.lastName,
+    'Email':      contact.email,
+    'Phone':      contact.phone,
+    'Title':      contact.title,
+    'Company':    contact.company,
+    'Submission Date': new Date().toISOString(),
+  });
+
   window.location.href = 'assessment.html';
 }
 </script>
 </body>
 </html>
+
