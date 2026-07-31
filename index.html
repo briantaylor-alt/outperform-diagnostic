@@ -3,99 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sales Organization Diagnostic — Outperform Institute</title>
+<title>Diagnostic Assessment — Outperform Institute</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --ink:#0e0e0e;--ink-mid:#3a3a3a;--ink-soft:#888;--ink-faint:#c8c8c0;
-    --surface:#f7f6f2;--white:#ffffff;--green:#1d9e75;--green-light:#e1f5ee;
-    --green-dark:#0f6e56;--border:#e2e1db;--radius:10px;--radius-lg:16px;
-  }
+  :root{--ink:#0e0e0e;--ink-mid:#3a3a3a;--ink-soft:#888;--ink-faint:#c8c8c0;--surface:#f7f6f2;--white:#ffffff;--green:#1d9e75;--green-light:#e1f5ee;--green-dark:#0f6e56;--border:#e2e1db;--radius:10px;--radius-lg:16px}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html{font-size:16px;scroll-behavior:smooth}
   body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;line-height:1.6}
 
-  /* HEADER */
-  .site-header{background:var(--ink);padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .site-header{background:var(--ink);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
   .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-  .logo-ring{width:32px;height:32px;border:2.5px solid var(--green);border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center}
-  .logo-ring::after{content:'';width:3px;height:12px;background:var(--green);border-radius:2px;position:absolute;bottom:3px}
-  .logo-text{font-size:13px;font-weight:500;color:#fff;letter-spacing:0.02em}
+  .logo-ring{width:28px;height:28px;border:2px solid var(--green);border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center}
+  .logo-ring::after{content:'';width:2.5px;height:10px;background:var(--green);border-radius:2px;position:absolute;bottom:2px}
+  .logo-text{font-size:12px;font-weight:500;color:#fff}
   .logo-text span{color:var(--green)}
+  .progress-indicator{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.5)}
 
-  /* HERO */
-  .hero{background:var(--ink);color:#fff;padding:4rem 2rem 3rem;text-align:center}
-  .hero-eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.15em;color:var(--green);text-transform:uppercase;margin-bottom:1.25rem}
-  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.25rem);font-weight:400;line-height:1.15;margin-bottom:1rem;max-width:640px;margin-left:auto;margin-right:auto}
-  .hero h1 em{font-style:italic;color:var(--green)}
-  .hero p{font-size:15px;color:rgba(255,255,255,0.6);max-width:480px;margin:0 auto 2rem;line-height:1.7}
-  .hero-meta{display:flex;justify-content:center;gap:2rem;font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.05em}
-  .hero-meta span::before{content:'— ';color:var(--green)}
+  .assessment-wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem 4rem}
 
-  /* WRAP */
-  .form-wrap{max-width:780px;margin:0 auto;padding:2rem 1.5rem 4rem}
+  /* PROGRESS */
+  .progress-row{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.5rem}
+  .progress-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width 0.3s}
+  .progress-text{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-soft);white-space:nowrap}
 
-  /* VIDEO */
-  .video-section{margin-bottom:2rem;text-align:center}
-  .video-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:0.5rem}
-  .video-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:var(--ink);margin-bottom:0.35rem}
-  .video-sub{font-size:13px;color:var(--ink-soft);margin-bottom:1.25rem;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.6}
-  .video-container{position:relative;border-radius:var(--radius-lg);overflow:hidden;background:var(--ink);box-shadow:0 8px 32px rgba(0,0,0,0.15)}
-  .video-unmute{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:#fff;font-size:12px;font-family:'DM Mono',monospace;padding:6px 14px;border-radius:20px;cursor:pointer;transition:opacity 0.3s;white-space:nowrap;z-index:10}
-  .video-unmute.hidden{opacity:0;pointer-events:none}
+  /* PILLAR TABS */
+  .pillar-tabs{display:flex;gap:4px;margin-bottom:1.5rem;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:6px;overflow-x:auto}
+  .ptab{flex:1;min-width:90px;padding:8px 10px;border:none;border-radius:var(--radius);background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--ink-soft);transition:all 0.2s;text-align:center;white-space:nowrap}
+  .ptab.active{background:var(--ink);color:#fff}
+  .ptab.complete{color:var(--green)}
+  .ptab.complete::after{content:' ✓';font-size:10px}
 
-  /* CONTACT FORM */
-  .contact-section{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;margin-bottom:2rem}
-  .section-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:0.5rem}
-  .section-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;margin-bottom:0.25rem}
-  .section-sub{font-size:13px;color:var(--ink-soft);margin-bottom:1.5rem;line-height:1.6}
-  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-  .field{display:flex;flex-direction:column;gap:5px}
-  .field.full{grid-column:1/-1}
-  label{font-size:12px;font-weight:500;color:var(--ink-mid);letter-spacing:0.02em}
-  input[type="text"],input[type="email"],input[type="tel"],select{border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);background:var(--surface);outline:none;transition:border-color 0.15s,background 0.15s;width:100%}
-  input:focus,select:focus{border-color:var(--green);background:var(--white)}
-  select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+  /* PILLAR PANEL */
+  .pillar-panel{display:none}
+  .pillar-panel.active{display:block}
+  .pillar-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:1.5rem}
+  .pillar-card-header{background:var(--ink);padding:1.5rem 2rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+  .pillar-number{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--green);text-transform:uppercase;margin-bottom:4px}
+  .pillar-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:#fff;margin-bottom:4px}
+  .pillar-desc{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;max-width:460px}
+  .pillar-weight-badge{font-family:'DM Mono',monospace;font-size:11px;padding:4px 10px;border:1px solid rgba(29,158,117,0.4);border-radius:20px;color:var(--green);white-space:nowrap;flex-shrink:0}
+  .pillar-card-body{padding:1.5rem 2rem}
 
-  /* ASSESSMENT PREVIEW */
-  .assessment-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem;margin-top:1.5rem}
-  .preview-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:0.4rem}
-  .preview-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:var(--ink);margin-bottom:0.75rem}
-  .preview-intro{font-size:13px;color:var(--ink-soft);line-height:1.7;margin-bottom:1.25rem}
-  .preview-grid{display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.25rem}
-  .preview-item{display:flex;gap:1rem;align-items:flex-start}
-  .preview-icon{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);background:var(--green-light);padding:4px 8px;border-radius:6px;flex-shrink:0;margin-top:2px}
-  .preview-name{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:2px}
-  .preview-desc{font-size:12px;color:var(--ink-soft);line-height:1.6}
-  .preview-note{font-size:12px;color:var(--ink-soft);border-top:1px solid var(--border);padding-top:1rem;font-style:italic;line-height:1.6}
+  /* QUESTIONS */
+  .question-block{border-bottom:1px solid var(--border);padding:1.25rem 0}
+  .question-block:last-child{border-bottom:none;padding-bottom:0}
+  .question-block:first-child{padding-top:0}
+  .q-number{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink-faint);margin-bottom:4px}
+  .q-text{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:4px;line-height:1.5}
+  .q-context{font-size:12px;color:var(--ink-soft);margin-bottom:1rem;line-height:1.6}
+  .rubric-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .rubric-option{border:1px solid var(--border);border-radius:var(--radius);padding:10px 8px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--surface);user-select:none}
+  .rubric-option:hover{border-color:var(--green);background:var(--green-light)}
+  .rubric-option.selected{border-color:var(--green);background:var(--green-light);box-shadow:inset 0 0 0 1px var(--green)}
+  .rub-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--ink-mid);display:block;margin-bottom:6px;transition:color 0.15s}
+  .rubric-option.selected .rub-val{color:var(--green-dark)}
+  .rub-label{font-size:10px;color:var(--ink-soft);line-height:1.4}
+  .rubric-option.selected .rub-label{color:var(--green-dark)}
 
-  /* REQUIRED FIELD INDICATOR */
-  .req{color:var(--green);margin-left:2px}
+  /* NAV */
+  .panel-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;gap:1rem}
+  .btn{padding:10px 22px;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s;border:1px solid var(--border);background:var(--white);color:var(--ink)}
+  .btn:hover{background:var(--surface)}
+  .btn-primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn-primary:hover{background:var(--ink-mid)}
+  .btn-submit{background:var(--green);color:#fff;border-color:var(--green);padding:12px 28px;font-size:15px}
+  .btn-submit:hover{background:var(--green-dark)}
 
-  /* ERROR STATE */
-  input.error,select.error{border-color:#c0392b;background:#fff8f8}
-  .error-msg{font-size:11px;color:#c0392b;margin-top:3px;display:none}
-  .error-msg.visible{display:block}
+  /* INCOMPLETE WARNING */
+  .incomplete-warning{display:none;background:#fff8f0;border:1px solid #f0a500;border-radius:var(--radius);padding:12px 16px;font-size:13px;color:#7a4f00;margin-top:1rem;text-align:center}
+  .incomplete-warning.visible{display:block}
 
-  /* CTA BUTTON */
-  .cta-wrap{text-align:center;margin-top:1rem}
-  .btn-cta{display:inline-flex;align-items:center;gap:10px;background:var(--green);color:#fff;border:none;padding:16px 36px;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(29,158,117,0.3)}
-  .btn-cta:hover{background:var(--green-dark);box-shadow:0 6px 24px rgba(29,158,117,0.4);transform:translateY(-1px)}
-  .btn-cta svg{width:20px;height:20px}
-  .cta-sub{font-size:12px;color:var(--ink-soft);margin-top:0.75rem;font-family:'DM Mono',monospace}
+  /* LOADING OVERLAY */
+  .loading-overlay{display:none;position:fixed;inset:0;background:rgba(14,14,14,0.85);z-index:200;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;gap:1.5rem}
+  .loading-overlay.active{display:flex}
+  .loading-spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,0.2);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:400}
+  .loading-sub{font-size:13px;color:rgba(255,255,255,0.6);font-family:'DM Mono',monospace}
 
-  /* TRUST BAR */
-  .trust-bar{display:flex;justify-content:center;gap:2rem;margin-top:2rem;padding-top:2rem;border-top:1px solid var(--border)}
-  .trust-item{text-align:center}
-  .trust-num{font-family:'Playfair Display',serif;font-size:24px;color:var(--green)}
-  .trust-label{font-size:11px;color:var(--ink-soft);font-family:'DM Mono',monospace;letter-spacing:0.05em}
-
-  @media(max-width:600px){
-    .field-grid{grid-template-columns:1fr}
-    .trust-bar{gap:1rem}
-    .hero{padding:2.5rem 1.25rem 2rem}
-  }
+  @media(max-width:600px){.pillar-card-header{flex-direction:column}.rub-label{display:none}.pillar-tabs{gap:2px}}
 </style>
 <!-- Google Analytics 4 — Outperform Institute -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NTTG74NJHE"></script>
@@ -112,279 +100,373 @@
 <body>
 
 <header class="site-header">
-  <a class="logo" href="#">
+  <a class="logo" href="index.html">
     <div class="logo-ring"></div>
     <span class="logo-text">Outperform<span>Institute</span></span>
   </a>
+  <span class="progress-indicator" id="header-progress">0 / 25 answered</span>
 </header>
 
-<div class="hero">
-  <div class="hero-eyebrow">Sales Performance Diagnostic</div>
-  <h1>Is your revenue system built to <em>scale</em>?</h1>
-  <p>Most sales organizations aren't built to scale — they're built on heroics. This diagnostic reveals exactly where your structure is holding you back.</p>
-  <div class="hero-meta">
-    <span>10–15 minutes</span>
-    <span>25 questions</span>
-    <span>Five pillars</span>
-  </div>
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-title">Analyzing your results...</div>
+  <div class="loading-sub">Generating your personalized diagnostic report</div>
 </div>
 
-<div class="form-wrap">
+<div class="assessment-wrap">
 
-  <!-- EXPLAINER VIDEO -->
-  <div class="video-section">
-    <div class="video-eyebrow">Watch Before You Begin</div>
-    <div class="video-title">Why this diagnostic is different</div>
-    <div class="video-sub">Two minutes. Understand what the Five Pillars reveal — and why honest answers matter more than aspirational ones.</div>
-    <div class="video-container">
-      <video id="explainer-video" src="explainer-16x9.mp4" autoplay muted playsinline controls style="width:100%;border-radius:var(--radius-lg);display:block;"></video>
-      <div class="video-unmute" id="unmute-btn" onclick="unmuteVideo()">🔇 Tap to unmute</div>
-    </div>
+  <div class="progress-row">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <span class="progress-text" id="progress-text">0 of 25 questions answered</span>
   </div>
 
-  <!-- CONTACT FORM -->
-  <div class="contact-section">
-    <div class="section-eyebrow">Before you begin</div>
-    <div class="section-title">Tell us about your organization</div>
-    <div class="section-sub">Your results will be personalized to your company. We'll also email you a copy of your report when you're done.</div>
-
-    <div class="field-grid">
-      <div class="field">
-        <label for="fname">First name <span class="req">*</span></label>
-        <input type="text" id="fname" placeholder="Alex">
-        <span class="error-msg" id="err-fname">Required</span>
-      </div>
-      <div class="field">
-        <label for="lname">Last name <span class="req">*</span></label>
-        <input type="text" id="lname" placeholder="Rivera">
-        <span class="error-msg" id="err-lname">Required</span>
-      </div>
-      <div class="field">
-        <label for="email">Work email <span class="req">*</span></label>
-        <input type="email" id="email" placeholder="alex@company.com">
-        <span class="error-msg" id="err-email">Valid email required</span>
-      </div>
-      <div class="field">
-        <label for="phone">Phone number <span class="req">*</span></label>
-        <input type="tel" id="phone" placeholder="(314) 555-0100">
-        <span class="error-msg" id="err-phone">Required</span>
-      </div>
-      <div class="field">
-        <label for="title">Your title <span class="req">*</span></label>
-        <input type="text" id="title" placeholder="VP of Sales, CRO, CEO...">
-        <span class="error-msg" id="err-title">Required</span>
-      </div>
-      <div class="field">
-        <label for="company">Company name <span class="req">*</span></label>
-        <input type="text" id="company" placeholder="Acme Corp">
-        <span class="error-msg" id="err-company">Required</span>
-      </div>
-      <div class="field">
-        <label for="teamsize">Sales team size</label>
-        <select id="teamsize">
-          <option value="">Select...</option>
-          <option value="1-10">1–10 reps</option>
-          <option value="11-25">11–25 reps</option>
-          <option value="26-50">26–50 reps</option>
-          <option value="51-100">51–100 reps</option>
-          <option value="100+">100+ reps</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="arr">Annual recurring revenue</label>
-        <select id="arr">
-          <option value="">Select...</option>
-          <option value="Under $5M">Under $5M</option>
-          <option value="$5M–$15M">$5M–$15M</option>
-          <option value="$15M–$50M">$15M–$50M</option>
-          <option value="$50M–$150M">$50M–$150M</option>
-          <option value="$150M+">$150M+</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="industry">Industry</label>
-        <select id="industry">
-          <option value="">Select...</option>
-          <option>B2B SaaS</option>
-          <option>Technology</option>
-          <option>Financial Services</option>
-          <option>Healthcare / Life Sciences</option>
-          <option>Manufacturing / Industrial</option>
-          <option>Professional Services</option>
-          <option>Other</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="assessment-preview">
-      <div class="preview-eyebrow">What to expect</div>
-      <div class="preview-title">What the assessment covers</div>
-      <p class="preview-intro">The survey includes 25 questions across five structural areas of your sales organization. Your responses will help assess the current state of your revenue system and identify key themes and priorities that will serve as the foundation for a more focused and productive discussion.</p>
-      <div class="preview-grid">
-        <div class="preview-item">
-          <div class="preview-icon">01</div>
-          <div class="preview-content">
-            <div class="preview-name">Go-to-Market Strategy</div>
-            <div class="preview-desc">How clearly your organization defines its target market, ideal customer profile, territory design, and growth strategy alignment.</div>
-          </div>
-        </div>
-        <div class="preview-item">
-          <div class="preview-icon">02</div>
-          <div class="preview-content">
-            <div class="preview-name">Management and Coaching</div>
-            <div class="preview-desc">The quality and consistency of your frontline management, coaching infrastructure, onboarding effectiveness, and leadership alignment.</div>
-          </div>
-        </div>
-        <div class="preview-item">
-          <div class="preview-icon">03</div>
-          <div class="preview-content">
-            <div class="preview-name">Revenue Visibility</div>
-            <div class="preview-desc">How clearly your leadership team can see pipeline quality, forecast accuracy, CRM data integrity, and real-time performance indicators.</div>
-          </div>
-        </div>
-        <div class="preview-item">
-          <div class="preview-icon">04</div>
-          <div class="preview-content">
-            <div class="preview-name">Talent Motivation</div>
-            <div class="preview-desc">Whether your compensation design, goal clarity, career architecture, and performance culture drive sustained discretionary effort.</div>
-          </div>
-        </div>
-        <div class="preview-item">
-          <div class="preview-icon">05</div>
-          <div class="preview-content">
-            <div class="preview-name">Operational Controls and Governance</div>
-            <div class="preview-desc">The rigor of your sales process enforcement, pipeline review discipline, forecast governance, and performance management cadence.</div>
-          </div>
-        </div>
-      </div>
-      <div class="preview-note">Score what actually happens in your organization day to day — not what's written in a playbook. The more honest your answers, the more valuable your results.</div>
-    </div>
-
-    <div class="cta-wrap">
-      <button class="btn-cta" onclick="startAssessment()">
-        Take the Diagnostic Assessment
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
-      </button>
-      <div class="cta-sub">Takes 10–15 minutes · Results delivered instantly</div>
-    </div>
+  <div class="pillar-tabs" id="pillar-tabs">
+    <button class="ptab active" onclick="showPanel(0)">1. Define</button>
+    <button class="ptab" onclick="showPanel(1)">2. Shape</button>
+    <button class="ptab" onclick="showPanel(2)">3. Enlighten</button>
+    <button class="ptab" onclick="showPanel(3)">4. Excite</button>
+    <button class="ptab" onclick="showPanel(4)">5. Control</button>
   </div>
 
-  <div class="trust-bar">
-    <div class="trust-item">
-      <div class="trust-num">25</div>
-      <div class="trust-label">Diagnostic questions</div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-num">5</div>
-      <div class="trust-label">Performance pillars</div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-num">10</div>
-      <div class="trust-label">Point scoring scale</div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-num">0</div>
-      <div class="trust-label">Obligation to book</div>
-    </div>
-  </div>
+  <div id="panel-0" class="pillar-panel active"></div>
+  <div id="panel-1" class="pillar-panel"></div>
+  <div id="panel-2" class="pillar-panel"></div>
+  <div id="panel-3" class="pillar-panel"></div>
+  <div id="panel-4" class="pillar-panel"></div>
 
 </div>
 
 <script>
-function unmuteVideo() {
-  const video = document.getElementById('explainer-video');
-  const btn = document.getElementById('unmute-btn');
-  video.muted = !video.muted;
-  btn.classList.toggle('hidden', !video.muted);
-  if (!video.muted) btn.textContent = '🔇 Tap to unmute';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const video = document.getElementById('explainer-video');
-  if (video) {
-    // Track video play
-    let videoTracked = false;
-    video.addEventListener('play', () => {
-      if (!videoTracked) {
-        trackEvent('video_play', { video_title: 'Explainer Video', page: 'landing' });
-        videoTracked = true;
-      }
-    });
-    // Track video completion (75%+)
-    video.addEventListener('timeupdate', () => {
-      if (!video._completionTracked && video.duration && (video.currentTime / video.duration) >= 0.75) {
-        trackEvent('video_progress', { video_title: 'Explainer Video', progress: '75%' });
-        video._completionTracked = true;
-      }
-    });
-    video.addEventListener('volumechange', () => {
-      const btn = document.getElementById('unmute-btn');
-      if (!video.muted) btn.classList.add('hidden');
-    });
-    video.play().catch(() => {});
+// ── QUESTION DATA ────────────────────────────────────────────────
+const PILLARS = [
+  { id:'define', name:'Define', subtitle:'Designed to Win', weight:0.20, pillarNum:'Pillar 01 of 05',
+    desc:'Does your organization have explicit, shared clarity on who you sell to, where you play, and how your go-to-market design maps to your growth strategy?',
+    questions:[
+      { id:'icp_clarity', label:'ICP clarity and segmentation', weight:1.5,
+        context:'Your documented ICP criteria — by segment, use case, and economics — are actively used by reps to qualify or disqualify deals.',
+        rubric:['No documented ICP. Every rep decides who to pursue. Ask three reps who your ideal customer is and get three answers.','ICP exists in a deck but is rarely referenced. Qualification happens by gut or relationship.','ICP is documented and discussed, but not consistently applied when qualifying deals.','ICP is clear and used in most deals. Some segments are better defined than others.','Explicit ICP by segment, use case, and economics. Reps disqualify confidently. No ambiguity.']},
+      { id:'territory_design', label:'Territory and account design', weight:1.5,
+        context:'Territories are balanced by addressable opportunity — not seniority or history. Reps in different regions have comparable earning potential.',
+        rubric:['Territories are informal or legacy-based. Coverage is an accident of org history.','Basic geographic splits. No TAM analysis. Some reps have 5× the opportunity of others.','Some design logic exists but hasn\'t been revisited against current market data.','Territories built on TAM and workload; some imbalance but reviewed annually.','Territories balanced using TAM, potential, whitespace, and workload. Reviewed and updated regularly.']},
+      { id:'capacity_model', label:'Headcount sizing and capacity model', weight:1.5,
+        context:'You know how many reps you need next year and why. Headcount planning ties quota capacity, ramp time, and attrition to the revenue target.',
+        rubric:['No capacity model. Headcount decisions are made reactively or by instinct.','Rough quota math exists but doesn\'t account for ramp, attrition, or segment mix.','Annual plan includes capacity logic but assumptions are soft.','Model exists and is referenced in planning. Updated when things change significantly.','Model ties quotas, ramp, attrition, and coverage to plan. Used actively in board discussions.']},
+      { id:'messaging', label:'Value proposition and messaging consistency', weight:1.0,
+        context:'Your team delivers consistent messaging across reps and segments. A prospect who talks to three different reps hears the same core value story.',
+        rubric:['No shared messaging. Every rep pitches differently. No one owns it.','A pitch deck exists. Some reps use it; most don\'t. No enforcement.','Messaging framework exists and is trained on, but execution varies by rep and manager.','Segment-specific messaging used by most reps. Occasional drift but largely consistent.','Segment-specific, differentiated messaging used consistently across all reps and channels.']},
+      { id:'strategy_alignment', label:'Growth strategy alignment', weight:1.0,
+        context:'Your sales design — roles, territories, segments — directly reflects where the company is betting for growth. Sales and leadership are building toward the same market.',
+        rubric:['Sales design hasn\'t changed in years despite strategy shifts. Disconnected from leadership priorities.','Leadership has a growth strategy. Sales has a quota. They\'re loosely related.','Alignment exists at the top but translation to day-to-day sales design is incomplete.','Sales design reflects current growth priorities with some lagging adjustments.','Sales design directly reflects growth bets, target segments, and strategic objectives. Reviewed quarterly.']}
+    ]
+  },
+  { id:'shape', name:'Shape', subtitle:'Built to Execute', weight:0.20, pillarNum:'Pillar 02 of 05',
+    desc:'Do you have the management system, coaching infrastructure, and enablement rigor required for repeatable execution — or does performance depend on who the manager is?',
+    questions:[
+      { id:'manager_quality', label:'Manager quality and operating cadence', weight:1.5,
+        context:'Your frontline managers are strong operators — not just former top reps. They run consistent team cadences, coach to behavior, and hold standards.',
+        rubric:['Managers were promoted for sales performance. No operating framework. Every manager runs differently.','Some managers are strong; most are inconsistent. No common cadence or standard.','Management quality varies significantly. Some run tight teams; others are inconsistent.','Most managers are solid operators with clear cadences. A few outliers.','Strong operators across the board. Common cadences, clear expectations, consistent standards.']},
+      { id:'coaching', label:'Coaching discipline', weight:1.5,
+        context:'Coaching happens on a regular, structured schedule — not just when deals are in trouble. Managers document what was discussed and track behavior change over time.',
+        rubric:['No coaching structure. Managers "help" when reps ask. No documentation.','Occasional deal coaching when things go wrong. No development-focused conversation.','Some managers coach regularly; others don\'t. No shared framework or documentation standard.','Coaching is regular and mostly behavior-based. Some documentation. Mostly consistent.','Structured coaching: regular, diagnostic, behavior-based, documented, tracked.']},
+      { id:'onboarding', label:'Onboarding effectiveness', weight:1.5,
+        context:'New reps hit ramp milestones on a defined timeline. Onboarding covers product, market, process, and systems — not just product.',
+        rubric:['No formal onboarding. New reps shadow and figure it out. Ramp is a mystery.','Product training exists. Sales process and CRM are learned on the job.','Structured program exists but milestones aren\'t tracked. Varies by manager.','Role-based onboarding with tracked ramp milestones. Good but not fully consistent.','Defined onboarding with tracked milestones across product, market, process, systems.']},
+      { id:'leadership_alignment', label:'Leadership alignment', weight:1.5,
+        context:'Sales leadership at every level uses common language, priorities, and governance. A front-line manager and the CRO are operating from the same playbook.',
+        rubric:['No alignment. Regions and teams operate with different priorities and language.','Leadership alignment is assumed but not built. Different managers emphasize different things.','Alignment at the top but inconsistent translation through the layers.','Common language and priorities across most of the org. Some drift at the edges.','Leaders use common language, priorities, and governance across all teams. Tight alignment.']},
+      { id:'methodology', label:'Sales methodology adoption', weight:1.0,
+        context:'Your sales methodology is embedded in CRM workflow, deal reviews, and manager conversations — not just a training certification reps completed once.',
+        rubric:['No methodology. Reps use whatever approach they learned at their last job.','Methodology was trained. Most reps can name it. Few actually use it.','Methodology is referenced but application varies widely. Not in CRM or deal reviews.','Embedded in most deal conversations and CRM. Exceptions exist but are visible.','Embedded in opportunity management, coaching conversations, and CRM workflow.']}
+    ]
+  },
+  { id:'enlighten', name:'Enlighten', subtitle:'See Clearly, Act Decisively', weight:0.20, pillarNum:'Pillar 03 of 05',
+    desc:'Can your leadership team see performance clearly enough to diagnose problems, coach in real time, and forecast with confidence?',
+    questions:[
+      { id:'kpi_architecture', label:'KPI architecture', weight:1.5,
+        context:'Your KPI set covers the full picture: activity, conversion, cycle time, pipeline quality, win rate, productivity, retention, and forecast accuracy.',
+        rubric:['No consistent KPI set. Leadership looks at attainment. Nothing else is reliably tracked.','Attainment and pipeline coverage tracked. Leading indicators absent or inconsistent.','Core KPIs defined but not all tracked consistently. Gaps in conversion and quality metrics.','Solid KPI set covering most dimensions. Some gaps in leading indicators or retention.','Full KPI coverage: activity, conversion, cycle time, pipeline quality, win rate, productivity, retention, forecast accuracy.']},
+      { id:'crm_quality', label:'CRM data quality and adoption', weight:1.5,
+        context:'Your CRM is the actual system of record — not a reporting tool reps update before pipeline calls. Data is trustworthy enough to make decisions from.',
+        rubric:['CRM is used by some reps, some of the time. Data is incomplete and untrustworthy.','CRM adoption is technically high but data quality is low. Fields filled inaccurately.','Core fields are mostly complete. Deal-level data is inconsistent. Reps update before calls.','High adoption with mostly reliable data. Some fields or segments lag.','CRM is the system of record. High adoption, disciplined field usage, data drives decisions.']},
+      { id:'pipeline_visibility', label:'Pipeline visibility and stage integrity', weight:1.5,
+        context:"Opportunity stages have objective criteria. A deal doesn't advance because the rep is optimistic — it advances because specific buyer actions have occurred.",
+        rubric:['No stage criteria. Deals move when the rep decides. Pipeline is fiction.','Stage names exist. Criteria don\'t. Movement is rep-driven and optimism-based.','Stage criteria documented but inconsistently applied. Deals still advance without validation.','Criteria exist and mostly applied. Some aging visibility. Conversion trends tracked.','Explicit stage criteria, aging visibility, and conversion trend analysis. Exit gates enforced.']},
+      { id:'forecast_discipline', label:'Forecasting discipline', weight:1.5,
+        context:'Your forecast process combines stage discipline, deal inspection, historical patterns, and managerial judgment. Leadership can defend the number with evidence.',
+        rubric:['Forecast is a guess. Reps submit a number. Manager adjusts. Board gets surprised.','Stage rollup with minimal inspection. Historical data not used. High variance.','Forecast has some structure but relies heavily on rep estimates. Variance is significant.','Disciplined process with inspection and history. Accuracy within acceptable range most cycles.','Combines stage discipline, deal inspection, historical patterns, and bias-checked judgment. High accuracy.']},
+      { id:'win_loss', label:'Win/loss intelligence', weight:1.0,
+        context:'You track why you win and lose — not just that you did. Win/loss patterns are coded, analyzed, and fed back into strategy and coaching.',
+        rubric:['No win/loss tracking. Losses are noted. Patterns are unknown.','Some anecdotal win/loss discussion in QBRs. Nothing systematic.','Win/loss data captured inconsistently. Reviewed occasionally but not acted on.','Patterns tracked and reviewed quarterly. Feeds some coaching and strategy conversations.','Patterns tracked, coded, analyzed, and used to improve strategy, messaging, and coaching.']}
+    ]
+  },
+  { id:'excite', name:'Excite', subtitle:'Motivate Sustained Performance', weight:0.15, pillarNum:'Pillar 04 of 05',
+    desc:'Does your team have a motivational environment built on fair pay, clear goals, career visibility, and leadership they trust?',
+    questions:[
+      { id:'comp_design', label:'Compensation plan design', weight:1.5,
+        context:"Your comp plan is simple enough for reps to calculate their own payout, aligned to what you actually want them to sell, and financially sound.",
+        rubric:['Comp plan is complex, inconsistent, or misaligned to strategy. Reps don\'t trust it.','Plan exists but has confusing elements, cap structures, or delays that create friction.','Mostly simple and fair. Some misalignment to priority behaviors or segments.','Simple, motivating, and aligned. Occasional edge cases create confusion.','Simple, motivating, financially sound, and aligned to strategy and role design.']},
+      { id:'goal_clarity', label:'Goal clarity and line of sight', weight:1.5,
+        context:"Every rep and manager can trace a clear line from their daily activities to their quota to the company's revenue target.",
+        rubric:['Goals exist. Line of sight doesn\'t. Reps don\'t know how activity connects to outcome.','Quotas are set. Activity expectations are vague or verbally communicated.','Goals are documented. Some visibility into how activity drives pipeline. Gaps remain.','Most roles have clear goals and visible activity-to-outcome path. Some gaps.','Every role has clear goals, measures, and a visible path from activity to outcome.']},
+      { id:'performance_culture', label:'Performance culture', weight:1.5,
+        context:'High standards feel fair. People who underperform are addressed — not ignored. Your top performers stay because they like competing here.',
+        rubric:['No performance culture. Underperformers are protected. Top performers leave.','Standards exist on paper. Enforcement is inconsistent and often avoided.','Culture is improving but underperformance management is still uncomfortable and delayed.','Standards are clear and mostly applied. Healthy competition. Occasional inconsistency.','Ambition, support, accountability, and healthy competition coexist. Fair and consistent.']},
+      { id:'recognition', label:'Recognition system', weight:1.0,
+        context:'Your recognition approach reinforces the behaviors and values you actually want — not just revenue. Leaders are visible and specific.',
+        rubric:['No recognition system. Revenue is the only measure of worth.','Recognition happens ad hoc. Leaders say "good job" occasionally. No structure.','Some recognition programs exist. Not consistent. Not clearly tied to strategic behaviors.','Recognition is regular and mostly tied to strategic behaviors. Some gaps in visibility.','Reinforces strategic behaviors, values, and peer credibility. Leaders are specific and visible.']},
+      { id:'career_retention', label:'Career pathing and top talent retention', weight:1.0,
+        context:"Your top performers know what the next level looks like and how to get there. Voluntary attrition in your top quartile is below industry average.",
+        rubric:['No career architecture. Top performers leave when they want a title or something new.','Career paths exist in theory. Promotions happen inconsistently without clear criteria.','Career paths documented but not consistently communicated or acted on.','Clear paths exist for most roles. Leaders discuss development regularly.','Clear career architecture by role, skill, and performance level. Top talent stays and refers others.']}
+    ]
+  },
+  { id:'control', name:'Control', subtitle:'Govern for Predictability', weight:0.25, pillarNum:'Pillar 05 of 05',
+    desc:'Does your organization govern pipeline, forecast, and execution with enough rigor to produce predictable outcomes — or are results still personality-dependent?',
+    questions:[
+      { id:'process_criteria', label:'Sales process and stage exit criteria', weight:1.5,
+        context:'Your sales process is role-specific, embedded in how managers run deal reviews, and enforced through clear exit criteria — not just documented in a slide deck.',
+        rubric:['No defined sales process. Every rep has their own approach.','Process documented but not used in management conversations or CRM.','Process is referenced occasionally. Stage criteria exist but aren\'t enforced.','Process is clear and mostly used. Exit criteria applied in most reviews.','Process is role-specific, embedded in daily management. Exit criteria are explicit and enforced.']},
+      { id:'pipeline_reviews', label:'Pipeline review rigor', weight:1.5,
+        context:'Pipeline reviews are diagnostic — they surface deal risk, challenge assumptions, and drive action. Not show-and-tell sessions.',
+        rubric:['No pipeline reviews. Or reviews that are just status updates with no challenge.','Reviews happen but are inconsistent. Managers ask "what\'s the status?" not "what\'s the risk?"','Some managers run rigorous reviews. Others don\'t. No standard for what good looks like.','Reviews are mostly diagnostic. Deals are challenged. Actions are assigned. Mostly consistent.','Evidence-based reviews with commit standards, bias checks, action owners, and follow-up.']},
+      { id:'forecast_governance', label:'Forecast governance', weight:1.5,
+        context:'Your forecast process has clear commit standards, an inspection layer, and a bias check. Leadership asks for evidence, not just manager estimates.',
+        rubric:['No forecast governance. Number submitted by reps, adjusted by managers, averaged upward.','Weak governance. Leader accepts manager estimates without inspection or challenge.','Some forecast discipline. Inspection happens sporadically. Variance is often explained away.','Governance structure exists with mostly consistent inspection. Accuracy improving.','Clear commit standards, deal-level inspection, and bias checks produce dependable forecasts.']},
+      { id:'performance_management', label:'Performance management cadence', weight:1.5,
+        context:"Underperformance is addressed on a defined timeline with specific consequences. Managers don't wait until Q4 to tell a rep they're off track.",
+        rubric:['No performance management process. Problems accumulate until someone exits or misses badly.','PIPs happen eventually. But reps are usually surprised when they get one.','Performance is discussed regularly but formal management is delayed and inconsistent.','Expectations and scorecards are mostly current. Underperformance addressed, if a bit slowly.','Expectations, scorecards, coaching plans, and consequences are timely and consistent.']},
+      { id:'continuous_improvement', label:'Continuous improvement loop', weight:1.0,
+        context:'When the sales system needs to change — process, messaging, methodology — changes are deliberate, tested, communicated, and measured.',
+        rubric:['No improvement process. Things change when someone is frustrated enough to demand it.','Changes happen reactively. No testing, no measurement, no rollout plan.','Some improvement efforts are intentional but follow-through and measurement are weak.','Process changes are structured and mostly tracked. Some gaps in measurement rigor.','Changes are prioritized, tested, rolled out with training, and measured systematically.']}
+    ]
   }
+];
 
-  // Track form field focus (form start)
-  const formFields = ['fname','lname','email','phone','title','company'];
-  let formStartTracked = false;
-  formFields.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('focus', () => {
-        if (!formStartTracked) {
-          trackEvent('form_start', { form_name: 'Contact Form' });
-          formStartTracked = true;
-        }
+const scores = {};
+let currentPanel = 0;
+
+// ── BUILD UI ─────────────────────────────────────────────────────
+function buildPanels() {
+  PILLARS.forEach((pillar, pi) => {
+    const panel = document.getElementById('panel-' + pi);
+    let html = `<div class="pillar-card">
+      <div class="pillar-card-header">
+        <div>
+          <div class="pillar-number">${pillar.pillarNum}</div>
+          <div class="pillar-name">${pillar.name} — ${pillar.subtitle}</div>
+          <div class="pillar-desc">${pillar.desc}</div>
+        </div>
+        <div class="pillar-weight-badge">${Math.round(pillar.weight*100)}% weight</div>
+      </div>
+      <div class="pillar-card-body">`;
+    pillar.questions.forEach((q, qi) => {
+      const key = `${pillar.id}_${q.id}`;
+      const globalNum = PILLARS.slice(0,pi).reduce((a,p) => a+p.questions.length,0) + qi + 1;
+      html += `<div class="question-block">
+        <div class="q-number">Q${globalNum} of 25</div>
+        <div class="q-text">${q.label}</div>
+        <div class="q-context">${q.context}</div>
+        <div class="rubric-grid">`;
+      q.rubric.forEach((desc,ri) => {
+        html += `<div class="rubric-option" id="opt-${key}-${ri}" onclick="selectScore('${key}',${ri+1},'${pillar.id}')">
+          <span class="rub-val">${ri+1}</span>
+          <span class="rub-label">${desc}</span>
+        </div>`;
       });
+      html += `</div></div>`;
+    });
+    html += `</div></div>`;
+    const isLast = pi === PILLARS.length - 1;
+    html += `<div class="panel-nav">`;
+    if (pi > 0) html += `<button class="btn" onclick="showPanel(${pi-1})">← Back</button>`;
+    else html += `<span></span>`;
+    if (!isLast) {
+      html += `<button class="btn btn-primary" onclick="showPanel(${pi+1})">Next: ${PILLARS[pi+1].name} →</button>`;
+    } else {
+      html += `<button class="btn btn-submit" onclick="submitAssessment()">Get My Results →</button>`;
     }
+    html += `</div>`;
+    if (isLast) {
+      html += `<div class="incomplete-warning" id="incomplete-warning">Please answer all questions before viewing your results. Unanswered questions are highlighted above.</div>`;
+    }
+    panel.innerHTML = html;
   });
-});
-
-function validateForm() {
-  let valid = true;
-  const required = [
-    { id: 'fname',   errId: 'err-fname',   type: 'text' },
-    { id: 'lname',   errId: 'err-lname',   type: 'text' },
-    { id: 'email',   errId: 'err-email',   type: 'email' },
-    { id: 'phone',   errId: 'err-phone',   type: 'text' },
-    { id: 'title',   errId: 'err-title',   type: 'text' },
-    { id: 'company', errId: 'err-company', type: 'text' },
-  ];
-  required.forEach(({ id, errId, type }) => {
-    const el = document.getElementById(id);
-    const err = document.getElementById(errId);
-    let bad = false;
-    if (!el.value.trim()) { bad = true; }
-    if (type === 'email' && el.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value)) { bad = true; }
-    el.classList.toggle('error', bad);
-    err.classList.toggle('visible', bad);
-    if (bad) valid = false;
-  });
-  return valid;
 }
 
-function startAssessment() {
-  if (!validateForm()) {
-    document.querySelector('.error').scrollIntoView({ behavior: 'smooth', block: 'center' });
+function selectScore(key, val, pillarId) {
+  scores[key] = val;
+  const pillarIdx = PILLARS.findIndex(p => p.id === pillarId);
+  for (let i=1;i<=5;i++) {
+    const el = document.getElementById(`opt-${key}-${i-1}`);
+    if (el) el.classList.toggle('selected', i===val);
+  }
+  updateProgress();
+  updateTabState();
+}
+
+function showPanel(idx) {
+  // Track pillar completion when moving forward
+  if (idx > currentPanel) {
+    const completedPillar = PILLARS[currentPanel];
+    const allAnswered = completedPillar.questions.every(q => scores[`${completedPillar.id}_${q.id}`] !== undefined);
+    if (allAnswered) {
+      trackEvent('pillar_complete', { pillar_name: completedPillar.name, pillar_index: currentPanel + 1 });
+    }
+  }
+  document.querySelectorAll('.pillar-panel').forEach((p,i) => p.classList.toggle('active', i===idx));
+  document.querySelectorAll('.ptab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  currentPanel = idx;
+  updateTabState();
+  window.scrollTo({ top: 80, behavior: 'smooth' });
+}
+
+function updateProgress() {
+  const total = PILLARS.reduce((a,p) => a+p.questions.length, 0);
+  const answered = Object.keys(scores).length;
+  const pct = (answered/total*100).toFixed(0);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${answered} of ${total} questions answered`;
+  document.getElementById('header-progress').textContent = `${answered} / ${total} answered`;
+}
+
+function updateTabState() {
+  PILLARS.forEach((pillar, pi) => {
+    const tab = document.querySelectorAll('.ptab')[pi];
+    const allAnswered = pillar.questions.every(q => scores[`${pillar.id}_${q.id}`] !== undefined);
+    tab.classList.toggle('complete', allAnswered && pi !== currentPanel);
+  });
+}
+
+// ── SCORING ──────────────────────────────────────────────────────
+function calcPillarScore(pillar) {
+  let weightedSum = 0, totalWeight = 0;
+  pillar.questions.forEach(q => {
+    const raw = scores[`${pillar.id}_${q.id}`] || 3;
+    weightedSum += (raw * 2) * q.weight;
+    totalWeight += q.weight;
+  });
+  return weightedSum / totalWeight;
+}
+
+function calcOverall(pillarScores) {
+  return PILLARS.reduce((sum, p, i) => sum + pillarScores[i] * p.weight, 0);
+}
+
+// ── SUBMIT ───────────────────────────────────────────────────────
+async function submitAssessment() {
+  // Check all answered
+  const unanswered = PILLARS.flatMap(p => p.questions.filter(q => !scores[`${p.id}_${q.id}`]));
+  if (unanswered.length > 0) {
+    document.getElementById('incomplete-warning').classList.add('visible');
     return;
   }
-  // Store contact data in sessionStorage for the assessment page
-  const contact = {
-    firstName: document.getElementById('fname').value.trim(),
-    lastName:  document.getElementById('lname').value.trim(),
-    email:     document.getElementById('email').value.trim(),
-    phone:     document.getElementById('phone').value.trim(),
-    title:     document.getElementById('title').value.trim(),
-    company:   document.getElementById('company').value.trim(),
-    teamSize:  document.getElementById('teamsize').value,
-    arr:       document.getElementById('arr').value,
-    industry:  document.getElementById('industry').value,
+
+  // Get contact data from sessionStorage
+  const contact = JSON.parse(sessionStorage.getItem('oi_contact') || '{}');
+  if (!contact.email) {
+    alert('Session expired. Please return to the start.');
+    window.location.href = 'index.html';
+    return;
+  }
+
+  // Calculate scores
+  const pillarScores = PILLARS.map(p => calcPillarScore(p));
+  const overall = calcOverall(pillarScores);
+
+  // Build full results object
+  const results = {
+    contact,
+    pillarScores,
+    overall,
+    scores: {...scores},
+    submittedAt: new Date().toISOString(),
   };
-  trackEvent('form_submit', { form_name: 'Contact Form', company: contact.company });
-  trackEvent('assessment_start', { company: contact.company });
-  sessionStorage.setItem('oi_contact', JSON.stringify(contact));
-  window.location.href = 'assessment.html';
+
+  // Store for results page
+  sessionStorage.setItem('oi_results', JSON.stringify(results));
+
+  // Show loading
+  document.getElementById('loading-overlay').classList.add('active');
+
+  // Save to Airtable
+  const airtableFields = {
+    'First Name': contact.firstName,
+    'Last Name': contact.lastName,
+    'Email': contact.email,
+    'Phone': contact.phone || '',
+    'Title': contact.title,
+    'Company': contact.company,
+    'Team Size': contact.teamSize,
+    'ARR': contact.arr,
+    'Industry': contact.industry,
+    'Submission Date': new Date().toISOString(),
+    'Overall Score': parseFloat(overall.toFixed(2)),
+    'Score Band': getBand(overall),
+    'Define Score': parseFloat(pillarScores[0].toFixed(2)),
+    'Shape Score': parseFloat(pillarScores[1].toFixed(2)),
+    'Enlighten Score': parseFloat(pillarScores[2].toFixed(2)),
+    'Excite Score': parseFloat(pillarScores[3].toFixed(2)),
+    'Control Score': parseFloat(pillarScores[4].toFixed(2)),
+    'Follow-Up Status': 'New',
+    ...Object.fromEntries(
+      PILLARS.flatMap(p => p.questions.map(q => [
+        `Q: ${p.name} — ${q.label}`,
+        scores[`${p.id}_${q.id}`] || null
+      ]))
+    )
+  };
+
+  // Fire all API calls in parallel
+  await Promise.allSettled([
+    fetch('/.netlify/functions/api', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'save', fields: airtableFields })
+    }),
+    fetch('/.netlify/functions/api', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        action: 'notify',
+        data: {
+          first_name: contact.firstName, last_name: contact.lastName,
+          email: contact.email, phone: contact.phone,
+          title: contact.title, company: contact.company,
+          team_size: contact.teamSize, arr: contact.arr,
+          overall_score: overall.toFixed(1), score_band: getBand(overall),
+          define_score: pillarScores[0].toFixed(1), shape_score: pillarScores[1].toFixed(1),
+          enlighten_score: pillarScores[2].toFixed(1), excite_score: pillarScores[3].toFixed(1),
+          control_score: pillarScores[4].toFixed(1),
+          submission_date: new Date().toLocaleString('en-US',{timeZone:'America/Chicago'}),
+        }
+      })
+    })
+  ]);
+
+  // Track assessment completion
+  trackEvent('assessment_complete', {
+    overall_score: overall.toFixed(1),
+    score_band: getBand(overall),
+    company: contact.company,
+  });
+
+  // Go to results
+  window.location.href = 'results.html';
 }
+
+function getBand(score) {
+  if (score>=9) return 'Best-in-class — scalable and disciplined';
+  if (score>=7.5) return 'Strong capability — some optimization opportunities';
+  if (score>=6) return 'Functional but inconsistent — likely constraining growth';
+  if (score>=4) return 'Material weakness — improvement should be prioritized';
+  return 'Dysfunctional or absent — immediate intervention required';
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+// Redirect if no contact data
+if (!sessionStorage.getItem('oi_contact')) {
+  window.location.href = 'index.html';
+}
+buildPanels();
 </script>
 </body>
 </html>
+
