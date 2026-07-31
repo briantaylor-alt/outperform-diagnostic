@@ -96,6 +96,8 @@
     if(typeof gtag !== "undefined") gtag("event", name, params || {});
   }
 </script>
+<!-- GHL External Tracking — page views only -->
+<script src="https://api.revenuelab360.com/js/external-tracking.js" data-tracking-id="tk_92d57f1396f44634b856b21f3d1f67d2" data-debug="true"></script>
 </head>
 <body>
 
@@ -295,6 +297,8 @@ function buildPanels() {
 
 function selectScore(key, val, pillarId) {
   scores[key] = val;
+  // Persist quiz progress to localStorage
+  localStorage.setItem('oi_quiz_progress', JSON.stringify(scores));
   const pillarIdx = PILLARS.findIndex(p => p.id === pillarId);
   for (let i=1;i<=5;i++) {
     const el = document.getElementById(`opt-${key}-${i-1}`);
@@ -362,7 +366,10 @@ async function submitAssessment() {
   }
 
   // Get contact data from sessionStorage
-  const contact = JSON.parse(sessionStorage.getItem('oi_contact') || '{}');
+  const contact = JSON.parse(
+    localStorage.getItem('oi_contact') ||
+    sessionStorage.getItem('oi_contact') || '{}'
+  );
   if (!contact.email) {
     alert('Session expired. Please return to the start.');
     window.location.href = 'index.html';
@@ -382,11 +389,16 @@ async function submitAssessment() {
     submittedAt: new Date().toISOString(),
   };
 
-  // Store for results page
+  // Store for results page — both storages for resilience
   sessionStorage.setItem('oi_results', JSON.stringify(results));
+  localStorage.setItem('oi_results', JSON.stringify(results));
 
   // Show loading
   document.getElementById('loading-overlay').classList.add('active');
+
+  // Calculate Total Score (out of 100) and Simplified Score (out of 10)
+  const totalScore = Math.round(overall * 10);
+  const simplifiedScore = parseFloat(overall.toFixed(1));
 
   // Save to Airtable
   const airtableFields = {
@@ -416,6 +428,23 @@ async function submitAssessment() {
     )
   };
 
+  // GHL WEBHOOK ACTION B — full payload with scores (fire-and-forget)
+  // Uses same email as Action A — GHL deduplicates and updates existing contact
+  const ghlActionBPayload = {
+    'First Name':       contact.firstName,
+    'Last Name':        contact.lastName,
+    'Email':            contact.email,
+    'Phone':            contact.phone || '',
+    'Title':            contact.title,
+    'Company':          contact.company,
+    'Team Size':        contact.teamSize,
+    'ARR':              contact.arr,
+    'Industry':         contact.industry,
+    'Total Score':      totalScore,
+    'Simplified Score': simplifiedScore,
+    'Submission Date':  new Date().toISOString(),
+  };
+
   // Fire all API calls in parallel
   await Promise.allSettled([
     fetch('/.netlify/functions/api', {
@@ -424,21 +453,8 @@ async function submitAssessment() {
     }),
     fetch('/.netlify/functions/api', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        action: 'notify',
-        data: {
-          first_name: contact.firstName, last_name: contact.lastName,
-          email: contact.email, phone: contact.phone,
-          title: contact.title, company: contact.company,
-          team_size: contact.teamSize, arr: contact.arr,
-          overall_score: overall.toFixed(1), score_band: getBand(overall),
-          define_score: pillarScores[0].toFixed(1), shape_score: pillarScores[1].toFixed(1),
-          enlighten_score: pillarScores[2].toFixed(1), excite_score: pillarScores[3].toFixed(1),
-          control_score: pillarScores[4].toFixed(1),
-          submission_date: new Date().toLocaleString('en-US',{timeZone:'America/Chicago'}),
-        }
-      })
-    })
+      body: JSON.stringify({ action:'ghl_webhook', payload: ghlActionBPayload })
+    }),
   ]);
 
   // Track assessment completion
@@ -461,11 +477,35 @@ function getBand(score) {
 }
 
 // ── INIT ─────────────────────────────────────────────────────────
-// Redirect if no contact data
-if (!sessionStorage.getItem('oi_contact')) {
+// Redirect if no contact data — check both storages
+if (!sessionStorage.getItem('oi_contact') && !localStorage.getItem('oi_contact')) {
   window.location.href = 'index.html';
+} else if (!sessionStorage.getItem('oi_contact') && localStorage.getItem('oi_contact')) {
+  sessionStorage.setItem('oi_contact', localStorage.getItem('oi_contact'));
 }
+
+// Restore quiz progress from localStorage if returning to page
+const savedProgress = localStorage.getItem('oi_quiz_progress');
+if (savedProgress) {
+  try {
+    const saved = JSON.parse(savedProgress);
+    Object.assign(scores, saved);
+  } catch(e) {}
+}
+
 buildPanels();
+
+// After building panels, restore visual selection state for saved scores
+document.addEventListener('DOMContentLoaded', () => {
+  Object.entries(scores).forEach(([key, val]) => {
+    for (let i = 1; i <= 5; i++) {
+      const el = document.getElementById(`opt-${key}-${i-1}`);
+      if (el) el.classList.toggle('selected', i === val);
+    }
+  });
+  updateProgress();
+  updateTabState();
+});
 </script>
 </body>
 </html>
