@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -304,6 +305,56 @@ function updateTabState(){
   });
 }
 
+// ── EMAIL CONTENT BUILDERS ───────────────────────────────────────
+function buildScoreNarrativeText(overall, pillarScores) {
+  const weakest = pillarScores.reduce((m,s,i,a) => s<a[m]?i:m, 0);
+  const weakestName = ['Define','Shape','Enlighten','Excite','Control'][weakest];
+  const weakestScore = pillarScores[weakest].toFixed(1);
+
+  if(overall>=8){
+    return `Your overall score of ${overall.toFixed(1)} puts you in the top tier of sales organizations. Your systems, governance, and management infrastructure are largely in place. Your weakest pillar is ${weakestName} at ${weakestScore} — that is where the next level of performance lives. Organizations at this level are focused on optimization and scale, not structural repair.`;
+  } else if(overall>=6){
+    return `Your overall score of ${overall.toFixed(1)} reflects a sales organization that works — but inconsistently. Performance depends too heavily on which manager a rep lands under, which quarter it is, or which deals happen to close. Your weakest pillar is ${weakestName} at ${weakestScore}, and that is where the most structural stress is concentrated. Organizations in this range are typically one or two systemic fixes away from a materially more predictable revenue engine. The problem is not effort — it is architecture.`;
+  } else if(overall>=4){
+    return `Your overall score of ${overall.toFixed(1)} indicates material structural weakness across the revenue organization. Your ${weakestName} pillar scored ${weakestScore} — that is the most urgent pressure point. At this level, revenue growth is largely personality-dependent. A few strong performers carry the number while the underlying system creates drag, forecast noise, and performance variability that compounds over time. The good news: organizations at this stage see the fastest improvement from intentional structural investment because the leverage is high.`;
+  } else {
+    return `Your overall score of ${overall.toFixed(1)} signals that the current sales architecture needs significant attention across multiple pillars. Your ${weakestName} pillar at ${weakestScore} is the most critical gap. The organization is running on individual heroics rather than systems — which means growth is unpredictable, the forecast is unreliable, and the business is fragile to attrition of key performers. This is not a talent problem. It is a structural one, and it is fixable.`;
+  }
+}
+
+function buildPillarBreakdownText(pillarScores) {
+  const pillarNames = ['Define','Shape','Enlighten','Excite','Control'];
+  const subtitles = ['Designed to Win','Built to Execute','See Clearly Act Decisively','Motivate Sustained Performance','Govern for Predictability'];
+  const narratives = [
+    ['Your market definition is not driving sales execution. Reps are choosing their own targets, territories are unbalanced, and the ICP is aspirational at best.','You have the building blocks of a defined go-to-market, but gaps in territory design or capacity planning are limiting coverage efficiency.','Define is functional but inconsistent. ICP is understood but not always applied. Territory design exists but has not been pressure-tested against current market data.','Strong foundation. ICP clarity and territory design are mostly working. Some optimization in whitespace coverage or capacity modeling will unlock more.','Excellent market definition. ICP is explicit, territories are balanced by opportunity, and sales design directly reflects strategic priorities.'],
+    ['Your management system is essentially absent. Coaching happens by accident, and manager quality is the primary determinant of rep success. This cannot scale.','Execution depends on which manager a rep lands under. The system is not driving outcomes — individuals are.','Shape is developing. Coaching and onboarding are improving but still inconsistent across managers. A common operating framework would compress the performance gap.','Strong Shape fundamentals. Most managers coach consistently and onboarding produces solid ramp outcomes.','Excellent management system. Coaching is structured, documented, and consistent. Leaders operate from a common framework.'],
+    ['Leadership is flying blind. CRM data is not trustworthy, pipeline stages are subjective, and the forecast is a negotiation. You cannot fix what you cannot see.','Significant visibility gaps. Forecast accuracy is low enough to make planning unreliable.','Enlighten is functional but inconsistent. Core visibility exists but gaps in CRM data quality or forecast discipline create noise at critical moments.','Good visibility infrastructure. KPIs, pipeline stages, and forecasting are mostly working.','Excellent data discipline. You have the visibility to diagnose problems in real time and forecast with confidence.'],
+    ['Your motivational environment is not built to retain or develop talent. Top performers are likely looking around.','Excite has real gaps. The comp plan creates friction, career paths are unclear, or the performance culture tolerates underperformance.','Excite is in the middle — some dimensions work, others do not. Inconsistency is leaving discretionary effort on the table.','Strong motivational environment. Comp is clear, goals have line of sight, and the performance culture is healthy.','Excellent. Your team understands how they get paid, where they are going, and that high standards are applied fairly.'],
+    ['Your system has no governance. Process exists but is not enforced. Forecast is a guess. Outcomes are entirely personality-dependent. This is the most urgent repair.','Control is the primary constraint on predictability. Process and forecast governance are inconsistent. Leadership gets surprised at quarter-end.','Control is developing. Process and stage criteria exist and are applied in most contexts, but enforcement gaps create noise.','Strong governance fundamentals. Process is mostly enforced, pipeline reviews are mostly diagnostic, and forecast governance is working.','Excellent execution governance. Process is enforced. Pipeline reviews surface real risk. Forecast governance produces dependable numbers.'],
+  ];
+
+  const impacts = [
+    {critical:'Likely seeing uneven territory productivity, missed coverage opportunities, and inaccurate capacity planning.',weak:'Likely seeing inconsistent pipeline quality across territories and ICP drift affecting win rates.',functional:'May be experiencing some territory imbalance limiting coverage efficiency.'},
+    {critical:'Likely seeing wide rep performance variability, slow ramp times, and manager-dependent outcomes.',weak:'Likely seeing coaching quality that varies significantly by manager, creating uneven team development.',functional:'May be experiencing some inconsistency in how managers develop their teams.'},
+    {critical:'Likely seeing forecast misses, pipeline inflation, slow executive decision making, and reduced board confidence.',weak:'Likely seeing forecast variance that makes planning difficult and CRM data that cannot be fully trusted.',functional:'May be experiencing some visibility gaps that create noise in the forecast.'},
+    {critical:'Likely seeing higher voluntary attrition among top performers and compensation friction reducing trust.',weak:'Likely seeing some retention risk among top talent and inconsistent motivation across the team.',functional:'May be experiencing occasional motivation gaps that limit discretionary effort.'},
+    {critical:'Likely seeing unpredictable revenue outcomes, late-stage deal losses that surprise leadership, and inflated pipelines.',weak:'Likely seeing process that exists but is not consistently enforced and pipeline reviews that lack rigor.',functional:'May be experiencing some execution inconsistency and forecast accuracy that fluctuates more than it should.'},
+  ];
+
+  let text = '';
+  pillarScores.forEach((score, i) => {
+    const band = score>=7.5?'Strong':score>=6?'Functional':score>=4?'Weak':'Critical';
+    const narIdx = score>=9?4:score>=7.5?3:score>=6?2:score>=4?1:0;
+    const impactTier = score<4?'critical':score<6?'weak':'functional';
+    text += `${pillarNames[i]} — ${subtitles[i]}\n`;
+    text += `Score: ${score.toFixed(1)}/10 · ${band}\n`;
+    text += `${narratives[i][narIdx]}\n`;
+    if(score < 7.5) text += `Operational impact: ${impacts[i][impactTier]}\n`;
+    text += '\n';
+  });
+  return text.trim();
+}
+
 // ── EMAIL GATE ───────────────────────────────────────────────────
 function getResults(){
   const unanswered=PILLARS.flatMap(p=>p.questions.filter(q=>!scores[`${p.id}_${q.id}`]));
@@ -357,6 +408,10 @@ async function proceedToResults(email){
   // Fire API calls
   const calls=[];
 
+  // Build narrative and pillar breakdown for email
+  const scoreNarrative = buildScoreNarrativeText(overall, pillarScores);
+  const pillarBreakdown = buildPillarBreakdownText(pillarScores);
+
   // Zapier notification — always fires regardless of email (notify Brian)
   const zapierPayload = Object.entries({
     email: email||'anonymous',
@@ -368,6 +423,8 @@ async function proceedToResults(email){
     excite_score: pillarScores[3].toFixed(1),
     control_score: pillarScores[4].toFixed(1),
     total_score: totalScore,
+    score_narrative: scoreNarrative,
+    pillar_breakdown: pillarBreakdown,
     submission_date: new Date().toLocaleString('en-US',{timeZone:'America/Chicago'}),
   }).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(String(v))).join('&');
 
