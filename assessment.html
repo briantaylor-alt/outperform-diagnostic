@@ -4,10 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diagnostic Assessment — Outperform Institute</title>
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -361,7 +357,27 @@ async function proceedToResults(email){
   // Fire API calls
   const calls=[];
 
-  // Save to Airtable if email provided
+  // Zapier notification — always fires regardless of email (notify Brian)
+  const zapierPayload = Object.entries({
+    email: email||'anonymous',
+    overall_score: overall.toFixed(1),
+    score_band: getBand(overall),
+    define_score: pillarScores[0].toFixed(1),
+    shape_score: pillarScores[1].toFixed(1),
+    enlighten_score: pillarScores[2].toFixed(1),
+    excite_score: pillarScores[3].toFixed(1),
+    control_score: pillarScores[4].toFixed(1),
+    total_score: totalScore,
+    submission_date: new Date().toLocaleString('en-US',{timeZone:'America/Chicago'}),
+  }).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(String(v))).join('&');
+
+  calls.push(fetch('https://hooks.zapier.com/hooks/catch/20271426/4uvl763/',{
+    method:'POST',
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body: zapierPayload,
+  }));
+
+  // Save to Airtable and fire GHL webhook if email provided
   if(email){
     const airtableFields={
       'Email':email,
@@ -378,7 +394,7 @@ async function proceedToResults(email){
     };
     calls.push(fetch('/.netlify/functions/api',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'save',fields:airtableFields})}));
 
-    // GHL Webhook — email only capture at gate stage
+    // GHL Webhook — email + scores
     calls.push(fetch('/.netlify/functions/api',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'ghl_webhook',payload:{
       'Email':email,
       'Total Score':totalScore,
