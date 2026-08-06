@@ -4,10 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your Diagnostic Results — Outperform Institute</title>
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <!-- jsPDF for PDF generation -->
@@ -122,7 +118,7 @@
     <div class="video-eyebrow">A message from Brian Taylor</div>
     <div class="video-title">What your results mean — and what to do next</div>
     <div class="video-container">
-      <iframe src="https://www.youtube.com/embed/PFpEBRpAi6g" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:440px;border-radius:var(--radius-lg);display:block;"></iframe>
+      <video src="results-video-loud.mp4" playsinline controls style="width:100%;height:440px;border-radius:var(--radius-lg);display:block;object-fit:cover;"></video>
     </div>
   </div>
 
@@ -588,7 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (calendlyEl) calendlyObserver.observe(calendlyEl);
 
   // Track results video play
-  const resultsVideo = document.querySelector('iframe[src*="youtube"]');
+  const resultsVideo = document.querySelector('.results-video-section video');
   if (resultsVideo) {
     const videoObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
