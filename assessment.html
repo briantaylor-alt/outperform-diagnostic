@@ -304,6 +304,151 @@ function updateTabState(){
   });
 }
 
+// ── BRANDED HTML EMAIL BUILDER ───────────────────────────────────
+function buildEmailHTML(email, overall, pillarScores, narrative, pillarBreakdown) {
+  const pillarNames = ['Define','Shape','Enlighten','Excite','Control'];
+  const band = getBand(overall);
+  const scoreColor = overall>=7.5?'#1d9e75':overall>=6?'#d4860e':'#c0392b';
+
+  // Build pillar score rows
+  const pillarRows = pillarNames.map((name, i) => {
+    const score = pillarScores[i];
+    const color = score>=7.5?'#1d9e75':score>=6?'#d4860e':'#c0392b';
+    const barWidth = Math.round(score * 10);
+    return `
+    <tr>
+      <td style="padding:8px 0;font-family:Arial,sans-serif;font-size:13px;color:#3a3a3a;width:100px;">${name}</td>
+      <td style="padding:8px 0;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="background:#e2e1db;border-radius:3px;height:6px;" width="100%">
+              <div style="background:${color};width:${barWidth}%;height:6px;border-radius:3px;min-width:4px;"></div>
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td style="padding:8px 0 8px 12px;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:${color};white-space:nowrap;width:50px;">${score.toFixed(1)}/10</td>
+    </tr>`;
+  }).join('');
+
+  // Format narrative paragraphs
+  const narrativeHtml = narrative.split('. ').reduce((acc, sentence, i, arr) => {
+    return acc + sentence + (i < arr.length - 1 ? '. ' : '');
+  }, '');
+
+  // Format pillar breakdown
+  const breakdownLines = pillarBreakdown.split('\n').map(line => {
+    if (!line.trim()) return '<br>';
+    if (line.includes(' — ') && !line.startsWith('Score') && !line.startsWith('Operational') && !line.startsWith('Likely')) {
+      return `<p style="margin:12px 0 4px;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#0e0e0e;">${line}</p>`;
+    }
+    if (line.startsWith('Score:')) {
+      const color2 = line.includes('Strong')?'#1d9e75':line.includes('Functional')?'#d4860e':'#c0392b';
+      return `<p style="margin:2px 0 6px;font-family:Arial,sans-serif;font-size:11px;color:${color2};font-weight:bold;text-transform:uppercase;letter-spacing:0.05em;">${line}</p>`;
+    }
+    return `<p style="margin:4px 0;font-family:Arial,sans-serif;font-size:13px;color:#555;line-height:1.6;">${line}</p>`;
+  }).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Your Diagnostic Results</title>
+</head>
+<body style="margin:0;padding:0;background:#f7f6f2;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f7f6f2;">
+<tr><td align="center" style="padding:24px 16px;">
+
+  <!-- EMAIL CONTAINER -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
+
+    <!-- HEADER -->
+    <tr>
+      <td style="background:#0e0e0e;padding:20px 32px;border-radius:12px 12px 0 0;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td>
+              <span style="font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#ffffff;letter-spacing:0.02em;">Outperform<span style="color:#1d9e75;">Institute</span></span>
+            </td>
+            <td align="right">
+              <span style="font-family:monospace;font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:0.08em;text-transform:uppercase;">Sales Diagnostic</span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- HERO SCORE -->
+    <tr>
+      <td style="background:#0e0e0e;padding:32px 32px 40px;text-align:center;">
+        <p style="margin:0 0 8px;font-family:monospace;font-size:10px;letter-spacing:0.15em;color:#1d9e75;text-transform:uppercase;">Your Blueprint Score</p>
+        <div style="font-family:Georgia,serif;font-size:72px;font-weight:400;color:${scoreColor};line-height:1;margin:0 0 8px;">${overall.toFixed(1)}</div>
+        <p style="margin:0 0 4px;font-family:Arial,sans-serif;font-size:15px;color:rgba(255,255,255,0.8);">${band}</p>
+        <p style="margin:0;font-family:monospace;font-size:11px;color:rgba(255,255,255,0.35);">Out of 10 · Five Pillars Assessment</p>
+      </td>
+    </tr>
+
+    <!-- GREEN ACCENT BAR -->
+    <tr><td style="background:#1d9e75;height:3px;"></td></tr>
+
+    <!-- PILLAR SCORES -->
+    <tr>
+      <td style="background:#ffffff;padding:32px 32px 24px;">
+        <p style="margin:0 0 20px;font-family:Georgia,serif;font-size:18px;color:#0e0e0e;">Pillar Scores</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          ${pillarRows}
+        </table>
+      </td>
+    </tr>
+
+    <!-- DIVIDER -->
+    <tr><td style="background:#ffffff;padding:0 32px;"><hr style="border:none;border-top:1px solid #e2e1db;margin:0;"></td></tr>
+
+    <!-- WHAT YOUR SCORE MEANS -->
+    <tr>
+      <td style="background:#ffffff;padding:24px 32px;">
+        <p style="margin:0 0 12px;font-family:Georgia,serif;font-size:18px;color:#0e0e0e;">What your score means</p>
+        <p style="margin:0;font-family:Arial,sans-serif;font-size:14px;color:#555;line-height:1.7;">${narrativeHtml}</p>
+      </td>
+    </tr>
+
+    <!-- DIVIDER -->
+    <tr><td style="background:#ffffff;padding:0 32px;"><hr style="border:none;border-top:1px solid #e2e1db;margin:0;"></td></tr>
+
+    <!-- PILLAR BREAKDOWN -->
+    <tr>
+      <td style="background:#ffffff;padding:24px 32px 32px;">
+        <p style="margin:0 0 16px;font-family:Georgia,serif;font-size:18px;color:#0e0e0e;">Pillar-by-pillar breakdown</p>
+        ${breakdownLines}
+      </td>
+    </tr>
+
+    <!-- CTA -->
+    <tr>
+      <td style="background:#e1f5ee;padding:32px;text-align:center;border-top:3px solid #1d9e75;">
+        <p style="margin:0 0 8px;font-family:Georgia,serif;font-size:20px;color:#085041;">Ready to close the gaps?</p>
+        <p style="margin:0 0 24px;font-family:Arial,sans-serif;font-size:13px;color:#0f6e56;line-height:1.7;max-width:400px;margin-left:auto;margin-right:auto;">Book a no-obligation 30-minute call with Brian Taylor to walk through your results together. No pitch — just a direct conversation about what your scores mean and what a path forward looks like.</p>
+        <a href="https://api.revenuelab360.com/widget/booking/eKYmMT60i4IvPiVSDB27" target="_blank" style="display:inline-block;background:#085041;color:#e1f5ee;font-family:Arial,sans-serif;font-size:14px;font-weight:bold;text-decoration:none;padding:14px 32px;border-radius:8px;letter-spacing:0.02em;">Book Your Results Review →</a>
+      </td>
+    </tr>
+
+    <!-- FOOTER -->
+    <tr>
+      <td style="background:#0e0e0e;padding:24px 32px;border-radius:0 0 12px 12px;text-align:center;">
+        <p style="margin:0 0 4px;font-family:Arial,sans-serif;font-size:12px;color:rgba(255,255,255,0.6);">Brian Taylor · Founder &amp; CEO, Outperform Institute</p>
+        <p style="margin:0;font-family:monospace;font-size:11px;color:rgba(255,255,255,0.3);">outperforminstitute.online</p>
+      </td>
+    </tr>
+
+  </table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
 // ── EMAIL CONTENT BUILDERS ───────────────────────────────────────
 function buildScoreNarrativeText(overall, pillarScores) {
   const weakest = pillarScores.reduce((m,s,i,a) => s<a[m]?i:m, 0);
@@ -411,6 +556,9 @@ async function proceedToResults(email){
   const scoreNarrative = buildScoreNarrativeText(overall, pillarScores);
   const pillarBreakdown = buildPillarBreakdownText(pillarScores);
 
+  // Build branded HTML email
+  const emailHtml = buildEmailHTML(email, overall, pillarScores, scoreNarrative, pillarBreakdown);
+
   // Zapier notification — always fires regardless of email (notify Brian)
   const zapierPayload = Object.entries({
     email: email||'anonymous',
@@ -424,6 +572,7 @@ async function proceedToResults(email){
     total_score: totalScore,
     score_narrative: scoreNarrative,
     pillar_breakdown: pillarBreakdown,
+    email_html: emailHtml,
     submission_date: new Date().toLocaleString('en-US',{timeZone:'America/Chicago'}),
   }).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(String(v))).join('&');
 
