@@ -147,7 +147,9 @@
   <div class="email-gate-card">
     <span class="email-gate-label">Almost There</span>
     <div class="email-gate-title">Where Should We Send Your Results?</div>
-    <div class="email-gate-sub">Enter your email and we'll display your results now and send you a copy of your full diagnostic report.</div>
+    <div class="email-gate-sub">Enter your name and email and we'll display your results now and send you a copy of your full diagnostic report.</div>
+    <input type="text" class="email-gate-input" id="gate-name" placeholder="Your full name">
+    <div class="email-err" id="gate-name-err">Please enter your name</div>
     <input type="email" class="email-gate-input" id="gate-email" placeholder="your@company.com">
     <div class="email-err" id="gate-email-err">Please enter a valid email address</div>
     <button class="email-gate-btn" onclick="submitWithEmail()">Show My Results →</button>
@@ -531,27 +533,48 @@ function getResults(){
   trackEvent('email_gate_shown',{});
 }
 
+function splitName(full){
+  const parts=(full||'').trim().split(/\s+/).filter(Boolean);
+  if(parts.length===0) return {firstName:'',lastName:''};
+  if(parts.length===1) return {firstName:parts[0],lastName:''};
+  return {firstName:parts.slice(0,-1).join(' '),lastName:parts[parts.length-1]};
+}
+
 function submitWithEmail(){
+  const nameEl=document.getElementById('gate-name');
+  const nameErrEl=document.getElementById('gate-name-err');
   const emailEl=document.getElementById('gate-email');
   const errEl=document.getElementById('gate-email-err');
+  const name=nameEl.value.trim();
   const email=emailEl.value.trim();
+  let valid=true;
+  if(!name){
+    nameEl.classList.add('error');
+    nameErrEl.classList.add('visible');
+    valid=false;
+  }else{
+    nameEl.classList.remove('error');
+    nameErrEl.classList.remove('visible');
+  }
   if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
     emailEl.classList.add('error');
     errEl.classList.add('visible');
-    return;
+    valid=false;
+  }else{
+    emailEl.classList.remove('error');
+    errEl.classList.remove('visible');
   }
-  emailEl.classList.remove('error');
-  errEl.classList.remove('visible');
+  if(!valid) return;
   trackEvent('email_gate_submit',{});
-  proceedToResults(email);
+  proceedToResults(email,name);
 }
 
 function skipEmail(){
   trackEvent('email_gate_skip',{});
-  proceedToResults(null);
+  proceedToResults(null,'');
 }
 
-async function proceedToResults(email){
+async function proceedToResults(email,name){
   document.getElementById('email-gate').classList.remove('active');
   document.getElementById('loading-overlay').classList.add('active');
 
@@ -559,9 +582,11 @@ async function proceedToResults(email){
   const overall=calcOverall(pillarScores);
   const totalScore=Math.round(overall*10);
 
+  const {firstName,lastName}=splitName(name);
+
   const contact={
     email: email||'',
-    firstName:'',lastName:'',phone:'',title:'',company:'',
+    firstName,lastName,phone:'',title:'',company:'',
     teamSize:'',arr:'',industry:'',
   };
 
@@ -582,6 +607,8 @@ async function proceedToResults(email){
   // Zapier notification — always fires regardless of email (notify Brian)
   const zapierPayload = Object.entries({
     email: email||'anonymous',
+    first_name: firstName||'',
+    last_name: lastName||'',
     overall_score: overall.toFixed(1),
     score_band: getBand(overall),
     define_score: pillarScores[0].toFixed(1),
@@ -618,14 +645,6 @@ async function proceedToResults(email){
       ...Object.fromEntries(PILLARS.flatMap(p=>p.questions.map(q=>[`Q: ${p.name} — ${q.label}`,scores[`${p.id}_${q.id}`]||null])))
     };
     calls.push(fetch('/.netlify/functions/api',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'save',fields:airtableFields})}));
-
-    // GHL Webhook — email + scores
-    calls.push(fetch('/.netlify/functions/api',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'ghl_webhook',payload:{
-      'Email':email,
-      'Total Score':totalScore,
-      'Simplified Score':parseFloat(overall.toFixed(1)),
-      'Submission Date':new Date().toISOString(),
-    }})}));
   }
 
   await Promise.allSettled(calls);

@@ -545,25 +545,6 @@ async function downloadPDF() {
   status.textContent = 'Report saved.';
   setTimeout(() => status.textContent = '', 4000);
 
-  // Upload PDF to GHL contact record (async — non-blocking)
-  try {
-    const pdfBase64 = doc.output('datauristring').split(',')[1];
-    fetch('/.netlify/functions/api', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'ghl_upload_pdf',
-        email: contact?.email,
-        pdfBase64,
-        fileName: filename,
-      }),
-    }).then(r => r.json()).then(d => {
-      if (d.success) console.log('[GHL] PDF uploaded to contact:', d.fileId);
-      else console.warn('[GHL] PDF upload skipped:', d.reason || d.error);
-    }).catch(e => console.warn('[GHL] PDF upload error:', e.message));
-  } catch(e) {
-    console.warn('[GHL] PDF generation error:', e.message);
-  }
 }
 
 // ── FADE-UP OBSERVER ─────────────────────────────────────────────
